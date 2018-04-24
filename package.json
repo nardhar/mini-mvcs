@@ -1,0 +1,23 @@
+{
+  "name": "mini-mvcs",
+  "version": "0.1.0",
+  "description": "MVCS mini framework for creating node rest apps, using express, sequelize",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@nardhar.org:nardhar/mini-mvcs.git"
+  },
+  "keywords": [
+    "node",
+    "rest",
+    "express",
+    "sequelize",
+    "ddd",
+    "mvc"
+  ],
+  "author": "Felix Carreño",
+  "license": "MIT"
+}
