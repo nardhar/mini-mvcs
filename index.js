@@ -7,6 +7,8 @@ const services = require('./loaders/service');
 const expressApp = require('./loaders/controller');
 const transactional = require('./util/transactional');
 const errors = require('./errors');
+const crudController = require('./crud/crud-controller');
+const crudService = require('./crud/crud-service');
 
 const start = () => {
   db.sequelize.sync().then(() => {
@@ -39,4 +41,6 @@ module.exports = {
   controllers: expressApp,
   errors,
   transactional,
+  crudController,
+  crudService,
 };
