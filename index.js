@@ -25,9 +25,9 @@ const start = () => {
                 _,..._|      )_-\\ \\_=.\\
                 \`-....-'\`------)))\`=-'"\`'"
 
-        Sistema ejecutandose en el puerto ${config.server.port}
-        ________________________________________________
-                // NOTE: La imagen es un castor
+          Sistema ejecutandose en el puerto ${config.server.port}
+      ______________________________________________
+              // NOTE: La imagen es un castor
       `);
     }
   });
