@@ -57,7 +57,7 @@ router.all(
 
 // carga las rutas de /controllers
 fileUtil.loaddirSync(
-  config.controller.dir || '../../../controllers',
+  config.controller.dir || `${__dirname}/../../../controllers`,
   config.controller.suffix || '.controller.js',
   config.controller.ignore || [],
   (err, file, filePath) => {
