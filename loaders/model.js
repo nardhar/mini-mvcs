@@ -10,7 +10,7 @@ const sequelize = config.database.use_env_variable
   : new Sequelize(config.database.database, config.database.username, config.database.password, config.database);
 
 fileUtil.loaddirSync(
-  config.model.dir || '../../../models',
+  config.model.dir || `${__dirname}/../../../models`,
   config.model.suffix || '.js',
   config.model.ignore || [],
   (err, file, filePath) => {

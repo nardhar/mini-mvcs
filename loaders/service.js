@@ -6,7 +6,7 @@ const services = {};
 
 // carga los servicios
 fileUtil.loaddirSync(
-  config.service.dir || '../../../services',
+  config.service.dir || `${__dirname}/../../../services`,
   config.service.suffix || '.service.js',
   config.service.ignore || [],
   (err, file, filePath) => {
