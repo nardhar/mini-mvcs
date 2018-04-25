@@ -1,5 +1,6 @@
 const models = require('./model');
 const fileUtil = require('../util/file');
+const config = require('./config');
 
 const services = {};
 
