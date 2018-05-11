@@ -55,6 +55,26 @@ router.all(
   },
 );
 
+// carga las rutas de /middlewares
+const middlewareList = [];
+fileUtil.loaddirSync(
+  config.middleware.dir || `${__dirname}/../../../middlewares`,
+  config.middleware.suffix || '.middleware.js',
+  config.middleware.ignore || [],
+  (err, file, filePath) => {
+    const middleware = require(filePath.substr(0, filePath.lastIndexOf('.')))(services);
+    middlewareList.push(middleware);
+  },
+);
+
+// ordena los middlewares
+middlewareList.sort((a, b) => {
+  return (a.order || 100) - (b.order || 100);
+})
+.forEach((middleware) => {
+  router.all('*', middleware.callback);
+});
+
 // carga las rutas de /controllers
 fileUtil.loaddirSync(
   config.controller.dir || `${__dirname}/../../../controllers`,
