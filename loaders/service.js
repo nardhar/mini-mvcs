@@ -4,7 +4,7 @@ const config = require('./config');
 
 const services = {};
 
-// carga los servicios
+// load the app services
 fileUtil.loaddirSync(
   config.service.dir || `${__dirname}/../../../services`,
   config.service.suffix || '.service.js',

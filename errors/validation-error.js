@@ -3,7 +3,7 @@ const FieldError = require('./field-error');
 
 class ValidationError extends ApiError {
   constructor(objectName, errors = []) {
-    super('ValidationError', `Error de Validación de "${objectName}"`);
+    super('ValidationError', `Validation error with "${objectName}"`);
     this.objectName = objectName;
     this.errors = errors;
   }
