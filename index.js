@@ -1,8 +1,12 @@
+const path = require('path');
+
+const appFolder = path.dirname(module.parent.filename);
+
 // carga los archivos de configuracion
-const config = require('./loaders/config');
-const db = require('./loaders/model');
+const config = require('./loaders/config')(appFolder);
+const db = require('./loaders/model')(config);
 // carga los parametros a publicar
-const transactional = require('./util/transactional');
+const transactional = require('./util/transactional')(db);
 const errors = require('./errors');
 const crudController = require('./crud/crud-controller');
 const crudService = require('./crud/crud-service');
