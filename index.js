@@ -37,9 +37,10 @@ const start = () => {
 // inicia la app despues de sincronizar la base
 module.exports = {
   start,
+  config,
   models: db,
   errors,
-  transactional,
+  withTransaction: transactional,
   crudController,
   crudService,
 };
