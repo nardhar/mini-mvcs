@@ -23,7 +23,9 @@ This has (IMHO) really good advantages:
 - The **Service** layer holds all the functionality that compounds the core of the application otherwise known as the Bussiness Layer, making it highly reusable for controllers and services themselves.
 - And last, it helps my code to be really functional, short and simple.
 
-If you think that your app does not need such complexity or maybe it would overload your application, then this mini-framework it's not for you.
+Another consideration is to have the minimum dependencies required to run a common REST app and be as functional as it can (avoid async/await).
+
+If you think that your app does not need such complexity or maybe it would overload your application, then this mini-framework is not for you.
 
 ## Installation
 
@@ -117,7 +119,7 @@ module.exports = (services, models) => {
 };
 ```
 
-They should always (unless configured otherwise) end with ```.service.js```, be lowercase named and separated with dash (-), e.g.: ```blog-tag.service.js``` (this will create a blogTag service)
+They should always end with ```.service.js``` (unless configured otherwise), be lowercase named and separated with dash (-), e.g.: ```blog-tag.service.js``` (this will create a blogTag service)
 
 In order to use some service inside another one you do not need to import it, just use the services variable like this:
 
@@ -179,7 +181,7 @@ module.exports = (router, services) => {
 };
 ```
 
-They should always (unless configured otherwise) end with ```.controller.js```.
+They should always end with ```.controller.js``` (unless configured otherwise).
 
 #### Transactional controllers
 
@@ -258,15 +260,100 @@ module.exports = (router, services) => {
 
 ### Creating Middlewares
 
+In case you want to add some middlewares, you can create a ```middlewares``` folder and create your middlewares files like this:
+
+```javascript
+// middlewares/auth.middleware.js
+// we can use the services
+module.exports = (services) => {
+  return {
+    // the order property helps to add the middlewares in a specific order
+    order: 10,
+    callback: (req, res, next) => {
+      return services.blog.read(req.headers.authorization).then((blog) => {
+        res.locals.blogId = blog.id;
+        next();
+      })
+      .catch(next);
+    },
+  };
+};
+```
+
+They should always (unless configured otherwise) end with ```.middleware.js```.
+
 ### Error Handling
+
+For generating DRYish errors I added some Error Classes (there are more samples in the sample/errors folder):
+
+#### ValidationError
+
+For throwing errors when some data should not proceed
+
+**Usage**
+
+Create a ValidationError instance and throw it:
+
+```javascript
+// services/blog.service.js
+const { ValidationError, FieldError } = require('mini-mvcs');
+
+module.exports = (services, models) => {
+  // ...
+
+  blogService.create = (params) => {
+    if (!params.title) {
+      throw new ValidationError('Blog', [
+        new FieldError('title', 'nullable'),
+      ]);
+    }
+    return models.Blog.create(params);
+  };
+
+  // ...
+};
+```
+
+By default, CrudService throws a ValidationError when something can not be saved (even from sequelize) and is catched by the error handling middleware
+
+#### NotFoundError
+
+For throwing errors when some data is not found
+
+**Usage**
+
+Create a NotFoundError instance and throw it:
+
+```javascript
+// services/blog.service.js
+const { NotFoundError } = require('mini-mvcs');
+
+module.exports = (services, models) => {
+  // ...
+
+  blogService.create = (params) => {
+    return models.Blog.findOne({ where: { id: params.id }})
+    .then((blogInstance) => {
+      if (!blogInstance) {
+        throw new NotFoundError('Blog', { id: params.id });
+      }
+      return blogInstance;
+    });
+  };
+
+  // ...
+};
+```
+
+By default, CrudService throws a NotFoundError when something is not found and is catched by the error handling middleware
 
 ### Running the App
 
-### Testing
+For running the app, just execute your ```index.js``` file as usual:
 
-## Samples
-
-No samples yet, but I promise I'll add some soon.
+```bash
+$ node index.js
+```
 
 ## FAQ
 
@@ -282,16 +369,16 @@ Besides, I think this library is more like a loader than a proper MVC framework.
 
 **Are you planning to add a View layer?**
 
-Although it is a somewhat MVC framework, my only intention is to work for REST apps (that is something that creates html responses), so I wouldn't add a proper View layer, unless it serves for formatting and generating the JSON response.
+Although it is a somewhat MVC framework, my only intention is to work for creating REST apps, so I wouldn't add a proper View layer, unless it serves for formatting and generating the JSON response.
 
 ## TODO
 
 Obviously there is a lot of work to do to improve this library, starting with (and in no particular order):
-- Give it a better name
+- Give it a better name.
 - Create a cli command for generating an app, models, controllers, services.
 - Make Sequelize and Express optional.
-- Include HATEOAS generation utilities.
-- Improve the Error API (Is it ok to be a class?).
-- Improve the REST templater (A wrapper may be a better idea).
-- Make it pluggable.
+- Include HATEOAS generation utilities (I have some ideas, just need to refine them).
+- Make it pluggable at all possible levels, although my intention is not for this to become a super library, but instead, to be a mini-framework for creating dry, simple and extensible REST apps.
 - Make CrudController and CrudService a plugin (or at least put them in another library).
+- Improve the Error API (Is it ok to be a class?) and make it pluggable.
+- Improve the REST templater (A wrapper may be a better idea) and make it pluggable.
