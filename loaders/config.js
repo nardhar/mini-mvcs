@@ -1,7 +1,9 @@
-const fs = require('fs');
+const path = require('path');
 
 const env = process.env.NODE_ENV || 'development';
 
-const config = require('../../../config')[env];
-
-module.exports = config;
+module.exports = (appPath) => {
+  // const config = require('../../../config')[env];
+  const config = require(path.resolve((appPath), 'config'))[env];
+  return Object.assign({}, config, { appPath });
+};
