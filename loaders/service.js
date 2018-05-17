@@ -7,7 +7,7 @@ module.exports = (config, models) => {
   // load the app services
   fileUtil.loaddirSync(
     path.resolve(config.appPath, config.service.dir || './services'),
-    config.service.suffix || '.service.js',
+    `${config.service.suffix || '.service'}.js`,
     config.service.ignore || [],
     (err, file, filePath) => {
       const serviceName = fileUtil.normalizeName(file.substr(0, file.indexOf('.')));

@@ -1,6 +1,6 @@
 {
   "name": "mini-mvcs",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "MVCS mini framework for creating node rest apps, using express, sequelize",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
     "ddd",
     "mvc"
   ],
-  "author": "Felix Carreño",
+  "author": "Felix Carreño <felix@felixcarreno.com>",
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.2",

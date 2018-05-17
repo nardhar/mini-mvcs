@@ -22,18 +22,15 @@ const start = () => {
     } else {
       expressApp.listen(config.server.port);
       // eslint-disable-next-line no-console
-      console.log(`
-App running on http://localhost:${config.server.port}
-      Here is a Beaver as logo
-                 ___
-              .="   "=._.---.
-            ."         c ' Y'\`p
-           /   ,       \`.  w_/
-       jgs |   '-.   /     /
-     _,..._|      )_-\\ \\_=.\\
-     \`-....-'\`------)))\`=-'"\`'"
-____________________________________
-      `);
+      console.log(`App running on http://localhost:${config.server.port}
+Here is an ascii art Beaver
+            ___
+         .="   "=._.---.
+       ."         c ' Y'\`p
+      /   ,       \`.  w_/
+  jgs |   '-.   /     /
+_,..._|      )_-\\ \\_=.\\
+\`-....-'\`------)))\`=-'"\`'"`);
     }
   });
 };
