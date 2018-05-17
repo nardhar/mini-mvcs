@@ -4,19 +4,19 @@ const appFolder = path.dirname(module.parent.filename);
 
 // carga los archivos de configuracion
 const config = require('./loaders/config')(appFolder);
-const db = require('./loaders/model')(config);
+const models = require('./loaders/model')(config);
 // carga los parametros a publicar
-const transactional = require('./util/transactional')(db);
+const transactional = require('./util/transactional')(models);
 const errors = require('./errors');
-const crudController = require('./crud/crud-controller');
+const crudController = require('./crud/crud-controller')(transactional);
 const crudService = require('./crud/crud-service');
 
 const start = () => {
   // carga despues los controladores para que el paquete mini-mvcs esté disponible en
   // los controladores/servicios que heredan de crudController y crudService respectivamente
-  const expressApp = require('./loaders/controller');
+  const expressApp = require('./loaders/controller')(config, models);
 
-  db.sequelize.sync().then(() => {
+  models.sequelize.sync().then(() => {
     if (process.env.FORCE || false) {
       process.exit(0);
     } else {
@@ -42,7 +42,7 @@ const start = () => {
 module.exports = {
   start,
   config,
-  models: db,
+  models,
   errors,
   withTransaction: transactional,
   crudController,
