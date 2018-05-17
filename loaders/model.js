@@ -26,7 +26,7 @@ module.exports = (config) => {
 
   fileUtil.loaddirSync(
     path.resolve(config.appPath, config.model.dir || './models'),
-    config.model.suffix || '.js',
+    `${config.model.suffix || ''}.js`,
     config.model.ignore || [],
     (err, file, filePath) => {
       const model = sequelize.import(filePath);

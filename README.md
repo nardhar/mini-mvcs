@@ -23,7 +23,7 @@ This has (IMHO) really good advantages:
 - The **Service** layer holds all the functionality that compounds the core of the application otherwise known as the Bussiness Layer, making it highly reusable for controllers and services themselves.
 - And last, it helps my code to be really functional, short and simple.
 
-Another consideration is to have the minimum dependencies required to run a common REST app and be as functional as it can (avoid async/await).
+Another consideration is to have the minimum dependencies required to run a common REST application and be as functional as it can (avoid async/await).
 
 If you think that your app does not need such complexity or maybe it would overload your application, then this mini-framework is not for you.
 
@@ -43,14 +43,53 @@ Create a ```config.js``` file following this structure:
 module.exports = {
   development: {
     database: {
-
+      database: {
+        username: "db_user",
+        password: "db_password",
+        database: "db_name",
+        host: "127.0.0.1",
+        port: 5432,
+        dialect: "postgres",
+        logging: false,
+        pool: {
+          max: 15,
+          min: 0,
+          idle: 10000
+        },
+      },
+      server: {
+        port: 4000,
+      },
+      api: {
+        main: '/api/v1/',
+      },
+      controller: {
+        dir: './controllers',
+        suffix: '.controller',
+        ignore: [],
+      },
+      middleware: {
+        dir: './middlewares',
+        suffix: '.middleware',
+        ignore: [],
+      },
+      model: {
+        dir: './models',
+        suffix: '.model',
+        ignore: [],
+      },
+      service: {
+        dir: './services',
+        suffix: '.service',
+        ignore: [],
+      },
     },
   },
   test: {
-
+    // same as development
   },
   production: {
-
+    // same as development
   },
 };
 ```

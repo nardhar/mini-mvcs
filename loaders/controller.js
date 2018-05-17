@@ -5,14 +5,12 @@ const cors = require('cors');
 const templater = require('../util/templater');
 const fileUtil = require('../util/file');
 const serviceLoader = require('./service');
-// const hateoas = require('../hateoas');
 
 module.exports = (config, models) => {
   const services = serviceLoader(config, models);
 
   const app = express();
 
-  // app.use(logger('dev'));
   app.use(cors({
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -29,7 +27,6 @@ module.exports = (config, models) => {
   // loads our templater
   templater.options({
     template: (object, defaultData, responseArgs, req) => { // eslint-disable-line no-unused-vars
-      // return hateoas.transform(object, req.route.path);
       return object;
     },
   });
@@ -55,7 +52,7 @@ module.exports = (config, models) => {
   const middlewareList = [];
   fileUtil.loaddirSync(
     path.resolve(config.appPath, config.middleware.dir || './middlewares'),
-    config.middleware.suffix || '.middleware.js',
+    `${config.controller.suffix || '.middleware'}.js`,
     config.middleware.ignore || [],
     (err, file, filePath) => {
       const middleware = require(filePath.substr(0, filePath.lastIndexOf('.')))(services);
@@ -74,7 +71,7 @@ module.exports = (config, models) => {
   // it loads the controllers
   fileUtil.loaddirSync(
     path.resolve(config.appPath, config.controller.dir || './controllers'),
-    config.controller.suffix || '.controller.js',
+    `${config.controller.suffix || '.controller'}.js`,
     config.controller.ignore || [],
     (err, file, filePath) => {
       require(filePath.substr(0, filePath.lastIndexOf('.')))(router, services);
