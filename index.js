@@ -1,45 +1,48 @@
-// carga los archivos de configuracion
-const config = require('./loaders/config');
-const db = require('./loaders/model');
-// carga los parametros a publicar
-const transactional = require('./util/transactional');
+const path = require('path');
+
+const appFolder = path.dirname(module.parent.filename);
+
+const config = require('./loaders/config')(appFolder);
+const models = require('./loaders/model')(config);
+const withTransaction = require('./util/transactional')(models);
 const errors = require('./errors');
-const crudController = require('./crud/crud-controller');
+const crudController = require('./crud/crud-controller')(withTransaction);
 const crudService = require('./crud/crud-service');
+const controllerLoader = require('./loaders/controller');
 
 const start = () => {
-  // carga despues los controladores para que el paquete mini-mvcs esté disponible en
-  // los controladores/servicios que heredan de crudController y crudService respectivamente
-  const expressApp = require('./loaders/controller');
+  // the controllers are loaded later so that mini-mvcs package is available in the
+  // controllers and services that inherit from crudController and crudService
+  const expressApp = controllerLoader(config, models);
 
-  db.sequelize.sync().then(() => {
+  // starts the app after syncing the database
+  models.sequelize.sync().then(() => {
     if (process.env.FORCE || false) {
       process.exit(0);
     } else {
-      expressApp.listen(config.server.port);
-      console.log(`
-                            ___
-                         .="   "=._.---.
-                       ."         c ' Y'\`p
-                      /   ,       \`.  w_/
-                  jgs |   '-.   /     /
-                _,..._|      )_-\\ \\_=.\\
-                \`-....-'\`------)))\`=-'"\`'"
-
-          Sistema ejecutandose en el puerto ${config.server.port}
-      ______________________________________________
-              // NOTE: La imagen es un castor
-      `);
+      const configServer = config.server || {};
+      const port = configServer.port || 4000;
+      expressApp.listen(port);
+      // eslint-disable-next-line no-console
+      console.log(`MiniMVCS app running on http://localhost:${port}
+Here is an ascii art beaver
+            ___
+         .="   "=._.---.
+       ."         c ' Y'\`p
+      /   ,       \`.  w_/
+  jgs |   '-.   /     /
+_,..._|      )_-\\ \\_=.\\
+\`-....-'\`------)))\`=-'"\`'"`);
     }
   });
 };
 
-// inicia la app despues de sincronizar la base
 module.exports = {
   start,
-  models: db,
+  config,
+  models,
   errors,
-  transactional,
+  withTransaction,
   crudController,
   crudService,
 };
