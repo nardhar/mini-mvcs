@@ -17,11 +17,15 @@ const associationList = {
 module.exports = (config) => {
   const sequelize = config.database.use_env_variable
     ? new Sequelize(process.env[config.database.use_env_variable], config.database.database)
-    : new Sequelize(config.database.database, config.database.username, config.database.password, config.database);
+    : new Sequelize(
+      config.database.database,
+      config.database.username,
+      config.database.password,
+      config.database,
+    );
 
   fileUtil.loaddirSync(
     path.resolve(config.appPath, config.model.dir || './models'),
-    // config.model.dir || `${__dirname}/../../../models`,
     config.model.suffix || '.js',
     config.model.ignore || [],
     (err, file, filePath) => {
@@ -39,29 +43,8 @@ module.exports = (config) => {
           },
         });
       }, { name: model.name });
-      // fakeDb[model.name] = {
-      //   belongsTo: (otherModel, options) => {
-      //     associationList.belongsTo.push({ model1: model.name, model2: otherModel.name, options });
-      //   },
-      //   hasOne: (otherModel, options) => {
-      //     associationList.hasOne.push({ model1: model.name, model2: otherModel.name, options });
-      //   },
-      //   belongsToMany: (otherModel, options) => {
-      //     associationList.belongsToMany.push({ model1: model.name, model2: otherModel.name, options });
-      //   },
-      //   hasMany: (otherModel, options) => {
-      //     associationList.hasMany.push({ model1: model.name, model2: otherModel.name, options });
-      //   },
-      // };
     },
   );
-
-  // plain old associator
-  // Object.keys(db).forEach((modelName) => {
-  //   if (db[modelName].associate) {
-  //     db[modelName].associate(db);
-  //   }
-  // });
 
   Object.keys(db).forEach((modelName) => {
     if (db[modelName].associate) {

@@ -10,11 +10,12 @@ const transactional = require('./util/transactional')(models);
 const errors = require('./errors');
 const crudController = require('./crud/crud-controller')(transactional);
 const crudService = require('./crud/crud-service');
+const controllerLoader = require('./loaders/controller');
 
 const start = () => {
   // carga despues los controladores para que el paquete mini-mvcs esté disponible en
   // los controladores/servicios que heredan de crudController y crudService respectivamente
-  const expressApp = require('./loaders/controller')(config, models);
+  const expressApp = controllerLoader(config, models);
 
   models.sequelize.sync().then(() => {
     if (process.env.FORCE || false) {
