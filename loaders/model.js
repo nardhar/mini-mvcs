@@ -25,7 +25,7 @@ module.exports = (config) => {
     config.model.suffix || '.js',
     config.model.ignore || [],
     (err, file, filePath) => {
-      const model = sequelize['import'](filePath);
+      const model = sequelize.import(filePath);
       db[model.name] = model;
       // building the fake associator
       fakeDb[model.name] = Object.keys(associationList).reduce((acc, associationType) => {
@@ -38,7 +38,7 @@ module.exports = (config) => {
             });
           },
         });
-      }, {});
+      }, { name: model.name });
       // fakeDb[model.name] = {
       //   belongsTo: (otherModel, options) => {
       //     associationList.belongsTo.push({ model1: model.name, model2: otherModel.name, options });
