@@ -23,7 +23,7 @@ This has (IMHO) really good advantages:
 - The **Service** layer holds all the functionality that compounds the core of the application otherwise known as the Bussiness Layer, making it highly reusable for controllers and services themselves.
 - And last, it helps my code to be really functional, short and simple.
 
-Another consideration is to have the minimum dependencies required to run a common REST app and be as functional as it can (avoid async/await).
+Another consideration is to have the minimum dependencies required to run a common REST application and be as functional as it can (avoid async/await).
 
 If you think that your app does not need such complexity or maybe it would overload your application, then this mini-framework is not for you.
 
@@ -43,14 +43,19 @@ Create a ```config.js``` file following this structure:
 module.exports = {
   development: {
     database: {
-
+      username: "db_user",
+      password: "db_password",
+      database: "db_name",
+      host: "127.0.0.1",
+      port: 5432,
+      dialect: "postgres",
     },
   },
   test: {
-
+    // same as development
   },
   production: {
-
+    // same as development
   },
 };
 ```
@@ -66,9 +71,35 @@ miniMvcs.start();
 
 Following are all the configurable variables:
 
+* ```database``` (Object) Sequelize variables for database configuration (all other options can be added)
+* ```database.username``` (String) Database username
+* ```database.password``` (String) Database user password
+* ```database.database``` (String) Database name
+* ```database.host``` (String) Database server host
+* ```database.port``` (Integer) Database server port
+* ```database.dialect``` (String) Database dialect
+* ```server``` (Object) Variables for the http server
+* ```server.port``` (Integer) (Default=4000) Http server port
+* ```api``` (Object) Variables for the Rest app
+* ```api.main``` (String) (Default="/api/v1/") Main route prefix
+* ```controller``` (Object) Controller configuration
+* ```controller.dir``` (String) (Default="./controllers") Controllers folder container, relative to index.js
+* ```controller.suffix``` (String) (Default=".controller") Suffix for controller files
+* ```controller.ignore``` (Array<String>) (Default=[]) Files to ignore when importing the controllers
+* ```middleware``` (Object) Middleware configuration
+* ```middleware.dir``` (String) (Default="./middlewares") Middlewares folder container, relative to index.js
+* ```middleware.suffix``` (String) (Default=".middleware") Suffix for middleware files
+* ```middleware.ignore``` (Array<String>) (Default=[]) Files to ignore when importing the middlewares
+* ```model``` (Object) Model configuration
+* ```model.dir``` (String) (Default="./models") Models folder container, relative to index.js
+* ```model.suffix``` (String) (Default=".model") Suffix for model files
+* ```model.ignore``` (Array<String>) (Default=[]) Files to ignore when importing the models
+* ```service``` (Object) Service configuration
+* ```service.dir``` (String) (Default="./services") Services folder container, relative to index.js
+* ```service.suffix``` (String) (Default=".service") Suffix for service files
+* ```service.ignore``` (Array<String>) (Default=[]) Files to ignore when importing the services
 
-
-And of course you can add some of your own and use them like this:
+And of course you can add some of your own and import them like this:
 
 ```javascript
 const { config } = require('miniMvcs');
