@@ -6,10 +6,11 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const templater = require('../util/templater');
 const fileUtil = require('../util/file');
+const serviceLoader = require('./service');
 // const hateoas = require('../hateoas');
 
 module.exports = (config, models) => {
-  const services = require('./service')(config, models);
+  const services = serviceLoader(config, models);
 
   const app = express();
 
@@ -29,7 +30,7 @@ module.exports = (config, models) => {
 
   // loads our templater
   templater.options({
-    template: (object, defaultData, responseArgs, req) => {
+    template: (object, defaultData, responseArgs, req) => { // eslint-disable-line no-unused-vars
       // return hateoas.transform(object, req.route.path);
       return object;
     },
@@ -56,7 +57,6 @@ module.exports = (config, models) => {
   const middlewareList = [];
   fileUtil.loaddirSync(
     path.resolve(config.appPath, config.middleware.dir || './middlewares'),
-    // config.middleware.dir || `${__dirname}/../../../middlewares`,
     config.middleware.suffix || '.middleware.js',
     config.middleware.ignore || [],
     (err, file, filePath) => {
@@ -66,7 +66,9 @@ module.exports = (config, models) => {
   );
 
   // it orders the middlewares and loads them in the router
-  middlewareList.sort((a, b) => (a.order || 100) - (b.order || 100))
+  middlewareList.sort((a, b) => {
+    return (a.order || 100) - (b.order || 100);
+  })
   .forEach((middleware) => {
     router.all('*', middleware.callback);
   });
@@ -74,7 +76,6 @@ module.exports = (config, models) => {
   // it loads the controllers
   fileUtil.loaddirSync(
     path.resolve(config.appPath, config.controller.dir || './controllers'),
-    // config.controller.dir || `${__dirname}/../../../controllers`,
     config.controller.suffix || '.controller.js',
     config.controller.ignore || [],
     (err, file, filePath) => {
@@ -86,7 +87,7 @@ module.exports = (config, models) => {
   app.use(config.api.main || '/api/v1', router);
 
   // it loads a really simple middleware error
-  app.use((err, req, res, next) => {
+  app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
     console.error(err.stack);
     return res.status(400).json({});
     // here i was trying to add an error handler

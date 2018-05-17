@@ -23,38 +23,7 @@ let staticOptions = {
 
   deleteShouldHaveBody: true,
   deleteStatusSuccess: 200,
-  deleteStatusFailure: 400
-};
-
-function customRestTemplater(req, res, next) {
-  /**
-   * adding customRest method with two arguments
-   * @param Object object: the object to be rendered as final data, if null should be send, then input {}
-   * @param Object responseArgs: the response arguments in case it should not be
-   @ @return Response: Response formatted with the buildResponse method
-   */
-  res.customRest = function(object, responseArgs = {}) {
-    // checks if response is successful by reviewing the staticOptions configuration and if the
-    // object sent is treated as empty
-    return buildResponse(
-      req,
-      res,
-      req.method,
-      !staticOptions[req.method.toLowerCase() + 'ShouldHaveBody'] || !isEmpty(object),
-      object,
-      responseArgs,
-    );
-  };
-
-  res.customRestSuccess = function(object, responseArgs = {}) {
-    return buildResponse(req, res, req.method, true, object, responseArgs);
-  };
-
-  res.customRestFailure = function(object, responseArgs = {}) {
-    return buildResponse(req, res, req.method, false, object, responseArgs);
-  };
-
-  next();
+  deleteStatusFailure: 400,
 };
 
 /**
@@ -65,11 +34,11 @@ function customRestTemplater(req, res, next) {
  */
 function findStatus(method, successful) {
   const successfulValue = successful ? 'Success' : 'Failure';
-  const statusKey = method.toLowerCase() + 'Status' + successfulValue;
+  const statusKey = `${method.toLowerCase()}Status${successfulValue}`;
   // check if staticOptions does not have statusKey key, otherwise returns a default status code
-  return staticOptions.hasOwnProperty(statusKey)
+  return statusKey in staticOptions
     ? staticOptions[statusKey]
-    : staticOptions['defaultStatus' + successfulValue];
+    : staticOptions[`defaultStatus${successfulValue}`];
 }
 
 /**
@@ -83,13 +52,13 @@ function findStatus(method, successful) {
 function buildResponse(req, res, method, successful, object, responseArgs = {}) {
   // inferes or sets the response status
   // a custom status could be sent in responseArgs
-  const status = responseArgs.hasOwnProperty('status')
+  const status = 'status' in responseArgs
     ? responseArgs.status
     // testing with the req.method param for generating the corresponding status code
     : findStatus(method, successful);
 
   // builds the response body
-  const jsonBody = staticOptions.hasOwnProperty('template')
+  const jsonBody = 'template' in staticOptions
     ? staticOptions.template(object, { status, message: STATUS_CODES[status] }, responseArgs, req)
     : object;
   // builds the corresponding data response as JSON
@@ -114,14 +83,45 @@ function isEmpty(obj) {
 
   // checks that at least one key in the object exists as a property
   return Object.keys(obj).reduce((hasProperty, key) => {
-    return hasProperty && !obj.hasOwnProperty(key);
+    return hasProperty && !(key in obj);
   }, true);
-};
+}
 
-customRestTemplater.options = function(options) {
-	if (typeof options === 'object') {
-		staticOptions = Object.assign({}, staticOptions, options);
-	}
+function customRestTemplater(req, res, next) {
+  /**
+   * adding customRest method with two arguments
+   * @param {Object} object: the object to be rendered as final data
+   * @param {Object} responseArgs: the response arguments in case it should not be
+   @ @return Response: Response formatted with the buildResponse method
+   */
+  res.customRest = function customRest(object, responseArgs = {}) {
+    // checks if response is successful by reviewing the staticOptions configuration and if the
+    // object sent is treated as empty
+    return buildResponse(
+      req,
+      res,
+      req.method,
+      !staticOptions[`${req.method.toLowerCase()}ShouldHaveBody`] || !isEmpty(object),
+      object,
+      responseArgs,
+    );
+  };
+
+  res.customRestSuccess = function customRestSuccess(object, responseArgs = {}) {
+    return buildResponse(req, res, req.method, true, object, responseArgs);
+  };
+
+  res.customRestFailure = function customRestFailure(object, responseArgs = {}) {
+    return buildResponse(req, res, req.method, false, object, responseArgs);
+  };
+
+  next();
+}
+
+customRestTemplater.options = function optionsFun(options) {
+  if (typeof options === 'object') {
+    staticOptions = Object.assign({}, staticOptions, options);
+  }
 };
 
 module.exports = customRestTemplater;
