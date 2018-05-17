@@ -5,10 +5,11 @@ module.exports = (config, models) => {
   const services = {};
 
   // load the app services
+  const configService = config.service || {};
   fileUtil.loaddirSync(
-    path.resolve(config.appPath, config.service.dir || './services'),
-    `${config.service.suffix || '.service'}.js`,
-    config.service.ignore || [],
+    path.resolve(config.appPath, configService.dir || './services'),
+    `${configService.suffix || '.service'}.js`,
+    configService.ignore || [],
     (err, file, filePath) => {
       const serviceName = fileUtil.normalizeName(file.substr(0, file.indexOf('.')));
       services[serviceName] =

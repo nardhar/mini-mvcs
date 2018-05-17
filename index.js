@@ -20,9 +20,11 @@ const start = () => {
     if (process.env.FORCE || false) {
       process.exit(0);
     } else {
-      expressApp.listen(config.server.port);
+      const configServer = config.server || {};
+      const port = configServer.port || 4000;
+      expressApp.listen(port);
       // eslint-disable-next-line no-console
-      console.log(`App running on http://localhost:${config.server.port}
+      console.log(`App running on http://localhost:${port}
 Here is an ascii art Beaver
             ___
          .="   "=._.---.
