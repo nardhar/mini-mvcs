@@ -24,8 +24,8 @@ const start = () => {
       const port = configServer.port || 4000;
       expressApp.listen(port);
       // eslint-disable-next-line no-console
-      console.log(`App running on http://localhost:${port}
-Here is an ascii art Beaver
+      console.log(`MiniMVCS app running on http://localhost:${port}
+Here is an ascii art beaver
             ___
          .="   "=._.---.
        ."         c ' Y'\`p
