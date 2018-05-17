@@ -4,8 +4,7 @@ class NotFoundError extends ApiError {
   constructor(objectName, filters, message = '') {
     super(
       'NotFoundError',
-      // message || `${objectName} con filtros "${filters}" no encontrado/a`,
-      message || `${objectName} no encontrado(a)`,
+      message || `${objectName} not found`,
     );
     this.objectName = objectName;
     this.filters = filters;
