@@ -24,10 +24,11 @@ module.exports = (config) => {
       config.database,
     );
 
+  const configModel = config.model || {};
   fileUtil.loaddirSync(
-    path.resolve(config.appPath, config.model.dir || './models'),
-    `${config.model.suffix || ''}.js`,
-    config.model.ignore || [],
+    path.resolve(config.appPath, configModel.dir || './models'),
+    `${configModel.suffix || ''}.js`,
+    configModel.ignore || [],
     (err, file, filePath) => {
       const model = sequelize.import(filePath);
       db[model.name] = model;
