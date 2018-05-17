@@ -1,8 +1,6 @@
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
-// const jwt = require('jwt-simple');
-// const request = require('request');
 const cors = require('cors');
 const templater = require('../util/templater');
 const fileUtil = require('../util/file');
@@ -88,7 +86,7 @@ module.exports = (config, models) => {
 
   // it loads a really simple middleware error
   app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
-    console.error(err.stack);
+    console.error(err.stack); // eslint-disable-line no-console
     return res.status(400).json({});
     // here i was trying to add an error handler
     // errors.handleError(err).then((httpError) => {
