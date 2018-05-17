@@ -1,5 +1,3 @@
-const withTransaction = require('../util/transactional');
-
 const defaultTransactional = (method) => {
   return ['post', 'put', 'delete'].indexOf(method.toLowerCase()) > -1;
 };
@@ -27,56 +25,58 @@ const findAction = (actions, method, callback) => {
   }
 };
 
-module.exports = (endpoint, router, service, actionsParam = []) => {
-  const actions = actionsParam.map(buildActions);
+module.exports = (withTransaction) => {
+  return (endpoint, router, service, actionsParam = []) => {
+    const actions = actionsParam.map(buildActions);
 
-  findAction(actions, 'index', (isTransactional) => {
-    router.get(`/${endpoint}`, (req, res, next) => {
-      return withTransaction(() => {
-        return service.listAndCount(req.query);
-      }, isTransactional)
-      .then(res.customRest)
-      .catch(next);
+    findAction(actions, 'index', (isTransactional) => {
+      router.get(`/${endpoint}`, (req, res, next) => {
+        return withTransaction(() => {
+          return service.listAndCount(req.query);
+        }, isTransactional)
+        .then(res.customRest)
+        .catch(next);
+      });
     });
-  });
 
-  findAction(actions, 'get', (isTransactional) => {
-    router.get(`/${endpoint}/:id`, (req, res, next) => {
-      return withTransaction(() => {
-        return service.read(req.params.id);
-      }, isTransactional)
-      .then(res.customRest)
-      .catch(next);
+    findAction(actions, 'get', (isTransactional) => {
+      router.get(`/${endpoint}/:id`, (req, res, next) => {
+        return withTransaction(() => {
+          return service.read(req.params.id);
+        }, isTransactional)
+        .then(res.customRest)
+        .catch(next);
+      });
     });
-  });
 
-  findAction(actions, 'post', (isTransactional) => {
-    router.post(`/${endpoint}`, (req, res, next) => {
-      return withTransaction(() => {
-        return service.save(req.body);
-      }, isTransactional)
-      .then(res.customRest)
-      .catch(next);
+    findAction(actions, 'post', (isTransactional) => {
+      router.post(`/${endpoint}`, (req, res, next) => {
+        return withTransaction(() => {
+          return service.save(req.body);
+        }, isTransactional)
+        .then(res.customRest)
+        .catch(next);
+      });
     });
-  });
 
-  findAction(actions, 'put', (isTransactional) => {
-    router.put(`/${endpoint}/:id`, (req, res, next) => {
-      return withTransaction(() => {
-        return service.update(req.params.id, req.body);
-      }, isTransactional)
-      .then(res.customRest)
-      .catch(next);
+    findAction(actions, 'put', (isTransactional) => {
+      router.put(`/${endpoint}/:id`, (req, res, next) => {
+        return withTransaction(() => {
+          return service.update(req.params.id, req.body);
+        }, isTransactional)
+        .then(res.customRest)
+        .catch(next);
+      });
     });
-  });
 
-  findAction(actions, 'delete', (isTransactional) => {
-    router.delete(`/${endpoint}/:id`, (req, res, next) => {
-      return withTransaction(() => {
-        return service.delete(req.params.id);
-      }, isTransactional)
-      .then(res.customRest)
-      .catch(next);
+    findAction(actions, 'delete', (isTransactional) => {
+      router.delete(`/${endpoint}/:id`, (req, res, next) => {
+        return withTransaction(() => {
+          return service.delete(req.params.id);
+        }, isTransactional)
+        .then(res.customRest)
+        .catch(next);
+      });
     });
-  });
+  };
 };

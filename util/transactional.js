@@ -1,5 +1,7 @@
-const { sequelize } = require('../loaders/model');
+// const { sequelize } = require('../loaders/model');
 
-module.exports = (fun, isTransactional = true) => {
-  return isTransactional ? sequelize.transaction(fun) : Promise.resolve(fun());
+module.exports = (models) => {
+  return (fun, isTransactional = true) => {
+    return isTransactional ? models.sequelize.transaction(fun) : Promise.resolve(fun());
+  };
 };
