@@ -35,8 +35,38 @@ module.exports = (model) => {
     });
   };
 
+  /**
+   * Metodo para convertir los parametros enviados para sequelize.[list|find|etc.]
+   * @param {Object} params parametros enviados
+   * @param {Integer} params.limit cantidad de registros a encontrar
+   * @param {Integer} params.offset cantidad de registros a saltarse
+   * @param {Integer} params.page cantidad de paginas(params.limit*(params.page-1)) a saltarse
+   * @param {Object[]} params.include modelos relacionados a ser incluidos
+   * @return {Object} datos a ser enviados al filtro de sequelize
+   */
   service.filter = (params) => {
-    return params;
+    const where = Object.keys(params).reduce((whereResult, key) => {
+      return ['limit', 'offset', 'page', 'include'].contains(key)
+        ? whereResult
+        : Object.assign({}, whereResult, { [key]: params[key] });
+    }, {});
+    return Object.assign({}, service.offsetLimit(params), service.include(params), { where });
+  };
+
+  service.offsetLimit = (params) => {
+    if ('limit' in params && ('page' in params || 'offset' in params)) {
+      return {
+        offset: 'offset' in params
+          ? params.offset
+          : (params.page - 1) * params.limit,
+        limit: params.limit,
+      };
+    }
+    return {};
+  };
+
+  service.include = (params) => {
+    return 'include' in params ? { include: params.include } : {};
   };
 
   service.find = (params) => {
