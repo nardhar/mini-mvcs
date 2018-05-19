@@ -5,9 +5,11 @@ const cors = require('cors');
 const templater = require('../util/templater');
 const fileUtil = require('../util/file');
 const serviceLoader = require('./service');
+const hateoasLoader = require('./hateoas');
 
 module.exports = (config, models) => {
   const services = serviceLoader(config, models);
+  const hateoas = hateoasLoader(config);
 
   const app = express();
 
@@ -27,7 +29,7 @@ module.exports = (config, models) => {
   // loads our templater
   templater.options({
     template: (object, defaultData, responseArgs, req) => { // eslint-disable-line no-unused-vars
-      return object;
+      return hateoas.transform(object, req.route.path);
     },
   });
   app.use(templater);
