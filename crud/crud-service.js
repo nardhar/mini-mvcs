@@ -1,5 +1,39 @@
 const { ValidationError, NotFoundError } = require('../errors');
 
+const objectMinusProperty = (object, property) => {
+  return Object.keys(object).reduce((acc, val) => {
+    return val === property ? acc : Object.assign({}, acc, { [val]: object[val] });
+  }, {});
+};
+
+const defaultFilter = (params, model) => {
+  // if there are associations on the query
+  const include = [];
+  const where = Object.keys(params).reduce((whereResult, key) => {
+    // it doesn't add pagination properties
+    if (['limit', 'offset', 'page'].indexOf(key) >= 0) return whereResult;
+    // if it is an association
+    if (key in model.associations) {
+      include.push(Object.assign(
+        {
+          model: model.associations[key].target,
+          as: model.associations[key].as,
+        },
+        // associations are "required" on demand
+        'required' in params[key] ? { required: params[key].required } : {},
+        // wheter it is required or not then it should remove the "required" property
+        defaultFilter(objectMinusProperty(params[key], 'required'), model.associations[key].target),
+      ));
+      return whereResult;
+    }
+    // TODO: maybe it should add only if it is either a Sequelize.Op or a model property
+    return Object.assign({}, whereResult, { [key]: params[key] });
+  }, {});
+
+  // builds the final object (it adds pagination here)
+  return include.length > 0 ? { where, include } : { where };
+};
+
 module.exports = (model) => {
   const service = {};
 
@@ -41,16 +75,15 @@ module.exports = (model) => {
    * @param {Integer} params.limit cantidad de registros a encontrar
    * @param {Integer} params.offset cantidad de registros a saltarse
    * @param {Integer} params.page cantidad de paginas(params.limit*(params.page-1)) a saltarse
-   * @param {Object[]} params.include modelos relacionados a ser incluidos
    * @return {Object} datos a ser enviados al filtro de sequelize
    */
   service.filter = (params) => {
-    const where = Object.keys(params).reduce((whereResult, key) => {
-      return ['limit', 'offset', 'page', 'include'].contains(key)
-        ? whereResult
-        : Object.assign({}, whereResult, { [key]: params[key] });
-    }, {});
-    return Object.assign({}, service.offsetLimit(params), service.include(params), { where });
+    // builds the final object (it adds pagination here)
+    return Object.assign(
+      {},
+      service.offsetLimit(params),
+      defaultFilter(params, model),
+    );
   };
 
   service.offsetLimit = (params) => {
@@ -65,12 +98,12 @@ module.exports = (model) => {
     return {};
   };
 
-  service.include = (params) => {
-    return 'include' in params ? { include: params.include } : {};
-  };
-
   service.find = (params) => {
-    return model.findOne(service.filter(params));
+    return model.findOne(service.filter(params))
+    .then((instance) => {
+      if (!instance) throw new NotFoundError(model.name, params);
+      return instance;
+    });
   };
 
   service.create = (params) => {
