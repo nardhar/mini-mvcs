@@ -21,8 +21,13 @@ const defaultFilter = (params, model) => {
         },
         // associations are "required" on demand
         'required' in params[key] ? { required: params[key].required } : {},
-        // wheter it is required or not then it should remove the "required" property
-        defaultFilter(objectMinusProperty(params[key], 'required'), model.associations[key].target),
+        // using the default filter again over the associated model
+        defaultFilter(
+          // whether it is required or not then it should remove the "required" property
+          objectMinusProperty(params[key], 'required'),
+          // sends the associated model for base of the new filter
+          model.associations[key].target,
+        ),
       ));
       return whereResult;
     }
@@ -30,8 +35,12 @@ const defaultFilter = (params, model) => {
     return Object.assign({}, whereResult, { [key]: params[key] });
   }, {});
 
-  // builds the final object (it adds pagination here)
-  return include.length > 0 ? { where, include } : { where };
+  // builds the final object
+  return Object.assign(
+    {},
+    Object.keys(where).length === 0 ? { where } : {},
+    include.length === 0 ? { include } : {},
+  );
 };
 
 module.exports = (model) => {
@@ -70,12 +79,12 @@ module.exports = (model) => {
   };
 
   /**
-   * Metodo para convertir los parametros enviados para sequelize.[list|find|etc.]
-   * @param {Object} params parametros enviados
-   * @param {Integer} params.limit cantidad de registros a encontrar
-   * @param {Integer} params.offset cantidad de registros a saltarse
-   * @param {Integer} params.page cantidad de paginas(params.limit*(params.page-1)) a saltarse
-   * @return {Object} datos a ser enviados al filtro de sequelize
+   * Method for making simple and easy sequelize queries
+   * @param {Object} params Object parameters
+   * @param {Integer} params.limit Amount of records to be returned
+   * @param {Integer} params.offset Amount of offset records
+   * @param {Integer} params.page Amount of offset pages(offset = limit * (page - 1))
+   * @return {Object} Sequelize query param formatted
    */
   service.filter = (params) => {
     // builds the final object (it adds pagination here)
