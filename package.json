@@ -4,7 +4,7 @@
   "description": "MVCS mini framework for creating node rest apps, using express, sequelize",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/unit/**/**.spec.js",
+    "test": "NODE_ENV=test mocha test/unit/**/**.spec.js",
     "test-int": "mocha test/integration/**/**.js"
   },
   "repository": {
