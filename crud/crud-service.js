@@ -38,8 +38,8 @@ const defaultFilter = (params, model) => {
   // builds the final object
   return Object.assign(
     {},
-    Object.keys(where).length === 0 ? { where } : {},
-    include.length === 0 ? { include } : {},
+    Object.keys(where).length > 0 ? { where } : {},
+    include.length > 0 ? { include } : {},
   );
 };
 
