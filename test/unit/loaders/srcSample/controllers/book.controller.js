@@ -14,4 +14,12 @@ module.exports = (router, services) => {
     })
     .catch(next);
   });
+
+  router.post('/book', () => {
+    return Promise.resolve({ result: true });
+  });
+
+  router.put('/book/:id', () => {
+    return Promise.resolve({ result: true });
+  });
 };

@@ -34,8 +34,8 @@ describe('controller Loader', () => {
 
       // double _all for the OPTIONS middleware and the added in the current app
       expect(routes).to.deep.include({ route: '*', methods: ['_all', '_all'] });
-      expect(routes).to.deep.include({ route: '/book', methods: ['get'] });
-      expect(routes).to.deep.include({ route: '/book/:id', methods: ['get'] });
+      expect(routes).to.deep.include({ route: '/book', methods: ['get', 'post'] });
+      expect(routes).to.deep.include({ route: '/book/:id', methods: ['get', 'put'] });
       done();
     });
   });
