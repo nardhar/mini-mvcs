@@ -10,6 +10,7 @@ module.exports = (appPath) => {
 
   const database = Object.assign({}, configDatabase, {
     sync: { force: process.env.FORCE || configDatabaseSync.force },
+    // so no Sequelize deprecated warning appears
     operatorsAliases: Op,
   });
 
