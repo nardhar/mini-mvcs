@@ -16,7 +16,6 @@
     "rest",
     "express",
     "sequelize",
-    "ddd",
     "mvc"
   ],
   "author": "Felix Carreño <felix@felixcarreno.com>",
