@@ -1,4 +1,3 @@
-const path = require('path');
 const { expect } = require('chai');
 
 const { NotFoundError, ValidationError, FieldError } = require('../../../errors');
