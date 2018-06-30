@@ -150,7 +150,7 @@ module.exports = (model) => {
   service.delete = (id) => {
     return service.read(id)
     .then((instance) => {
-      return instance.delete();
+      return instance.destroy();
     });
   };
 
