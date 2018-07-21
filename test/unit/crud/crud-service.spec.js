@@ -1,10 +1,11 @@
 const { expect } = require('chai');
 
+const crudService = require('../../../crud/crud-service');
 const { NotFoundError, ValidationError, FieldError } = require('../../../errors');
 
-describe('errors Api', () => {
-  describe('NotFoundError', () => {
-    it('should create an instance', (done) => {
+describe('CRUD Service', () => {
+  describe('Creating an instace', () => {
+    it('should have default methods', (done) => {
       const err = new NotFoundError('Object', { id: 1 });
 
       expect(err).to.be.an('error');
