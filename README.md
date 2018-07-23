@@ -35,7 +35,7 @@ This library was built using Node v8.11.1, the last LTS version at the time
 $ npm install -S mini-mvcs
 ```
 
-## Usage
+## Configuration
 
 Create a ```config.js``` file following this structure:
 
@@ -59,15 +59,6 @@ module.exports = {
   },
 };
 ```
-
-In the same folder create an ```index.js``` file and import the library for starting an app:
-
-```javascript
-const miniMvcs = require('miniMvcs');
-miniMvcs.start();
-```
-
-### Configuration
 
 Following are all the configurable variables:
 
@@ -99,13 +90,16 @@ Following are all the configurable variables:
 * ```service.suffix``` (String) (Default=".service") Suffix for service files
 * ```service.ignore``` (Array<String>) (Default=[]) Files to ignore when importing the services
 
-And of course you can add some of your own and import them like this:
+And of course you can add more variables of your own (more on that later).
+
+In the same folder create an ```index.js``` file and import the library for starting an app:
 
 ```javascript
-const { config } = require('miniMvcs');
+const miniMvcs = require('miniMvcs');
+miniMvcs.start();
 ```
 
-### Creating Models
+## Models
 
 Create a ```models``` folder and create your sequelize model files as usual, e.g.:
 
@@ -131,7 +125,7 @@ module.exports = (sequelize, DataTypes) => {
 };
 ```
 
-### Creating Services
+## Services
 
 Create a ```services``` folder and create a your services file like this:
 
@@ -195,7 +189,7 @@ module.exports = (services, models) => {
 
 This will create a service like the first block of service code in this section
 
-### Creating Controllers
+## Controllers
 
 Create a ```controllers``` folder and create a your controllers file like this:
 
