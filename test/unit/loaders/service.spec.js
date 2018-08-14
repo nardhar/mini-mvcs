@@ -29,7 +29,9 @@ describe('service Loader', () => {
       expect(services).to.have.property('book');
       expect(services).to.have.property('author');
       expect(services.book).to.be.an('object');
+      expect(services.book.list).to.be.a('function');
       expect(services.author).to.be.an('object');
+      expect(services.author.list).to.be.a('function');
       done();
     });
 

@@ -8,6 +8,8 @@ const objectMinusProperty = (object, property) => {
 
 const defaultFilter = (params, model) => {
   // if there are associations on the query
+  if (!params) return {};
+
   const include = [];
   const where = Object.keys(params).reduce((whereResult, key) => {
     // it doesn't add pagination properties
@@ -96,7 +98,7 @@ module.exports = (model) => {
   };
 
   service.offsetLimit = (params) => {
-    if ('limit' in params && ('page' in params || 'offset' in params)) {
+    if (params && 'limit' in params && ('page' in params || 'offset' in params)) {
       return {
         offset: 'offset' in params
           ? params.offset
@@ -150,7 +152,7 @@ module.exports = (model) => {
   service.delete = (id) => {
     return service.read(id)
     .then((instance) => {
-      return instance.delete();
+      return instance.destroy();
     });
   };
 
