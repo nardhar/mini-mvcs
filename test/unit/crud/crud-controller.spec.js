@@ -11,10 +11,13 @@ const withTransactionMock = (fun, isTransactional = true) => {
 };
 
 describe('CRUD Controller', () => {
+  let bookCrudController;
+  before(() => {
+    bookCrudController = crudController(withTransactionMock);
+  });
+
   describe('Creating a crud controller', () => {
     it('should have default methods', (done) => {
-      const bookCrudController = crudController(withTransactionMock);
-
       expect(bookCrudController).to.be.a('function');
       done();
     });
