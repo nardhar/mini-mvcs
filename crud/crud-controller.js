@@ -26,13 +26,13 @@ const findAction = (actions, method, callback) => {
 };
 
 module.exports = (withTransaction) => {
-  return (endpoint, router, service, actionsParam = []) => {
+  return (endpoint, router, crudService, actionsParam = []) => {
     const actions = actionsParam.map(buildActions);
 
     findAction(actions, 'index', (isTransactional) => {
       router.get(`/${endpoint}`, (req, res, next) => {
         return withTransaction(() => {
-          return service.listAndCount(req.query);
+          return crudService.listAndCount(req.query);
         }, isTransactional)
         .then(res.customRest)
         .catch(next);
@@ -42,7 +42,7 @@ module.exports = (withTransaction) => {
     findAction(actions, 'get', (isTransactional) => {
       router.get(`/${endpoint}/:id`, (req, res, next) => {
         return withTransaction(() => {
-          return service.read(req.params.id);
+          return crudService.read(req.params.id);
         }, isTransactional)
         .then(res.customRest)
         .catch(next);
@@ -52,7 +52,7 @@ module.exports = (withTransaction) => {
     findAction(actions, 'post', (isTransactional) => {
       router.post(`/${endpoint}`, (req, res, next) => {
         return withTransaction(() => {
-          return service.save(req.body);
+          return crudService.save(req.body);
         }, isTransactional)
         .then(res.customRest)
         .catch(next);
@@ -62,7 +62,7 @@ module.exports = (withTransaction) => {
     findAction(actions, 'put', (isTransactional) => {
       router.put(`/${endpoint}/:id`, (req, res, next) => {
         return withTransaction(() => {
-          return service.update(req.params.id, req.body);
+          return crudService.update(req.params.id, req.body);
         }, isTransactional)
         .then(res.customRest)
         .catch(next);
@@ -72,7 +72,7 @@ module.exports = (withTransaction) => {
     findAction(actions, 'delete', (isTransactional) => {
       router.delete(`/${endpoint}/:id`, (req, res, next) => {
         return withTransaction(() => {
-          return service.delete(req.params.id);
+          return crudService.delete(req.params.id);
         }, isTransactional)
         .then(res.customRest)
         .catch(next);

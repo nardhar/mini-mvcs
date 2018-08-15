@@ -1,23 +1,18 @@
 const { expect } = require('chai');
 // NOTE: sequelize-mock is not working right, or at least it does not emulates a database state
 // maybe a custom sequelize mock should be created or convert all these tests into integration ones
-const SequelizeMock = require('sequelize-mock');
-const crudController = require('../../../crud/crud-controller');
-
-const dbMock = new SequelizeMock();
+const crudControllerDefinition = require('../../../crud/crud-controller');
 
 const withTransactionMock = (fun, isTransactional = true) => {
-  return isTransactional ? dbMock.transaction(fun) : Promise.resolve(fun());
+  return isTransactional ? Promise.resolve(fun()) : Promise.resolve(fun());
 };
 
-describe('CRUD Controller', () => {
-  let bookCrudController;
-  before(() => {
-    bookCrudController = crudController(withTransactionMock);
-  });
+const crudController = crudControllerDefinition(withTransactionMock);
 
-  describe('Creating a crud controller', () => {
+describe('CRUD Controller', () => {
+  describe('Creating a default crud controller', () => {
     it('should have default methods', (done) => {
+      const bookCrudController = crudController('book', router, bookServiceMock);
       expect(bookCrudController).to.be.a('function');
       done();
     });
