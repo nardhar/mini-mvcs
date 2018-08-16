@@ -4,6 +4,7 @@ const { expect } = require('chai');
 const controllerLoader = require('../../../loaders/controller');
 
 const extractRoutes = (app) => {
+  // eslint-disable-next-line no-underscore-dangle
   const routesMap = app._router.stack.reduce((acc, middleware) => {
     if (middleware.name === 'router') {
       return middleware.handle.stack.reduce((acc2, middleware2) => {

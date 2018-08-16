@@ -27,7 +27,7 @@ describe('file Util module', () => {
     });
 
     it('should capitalize a word with a lot of normal and lower dashes combined', () => {
-      expect(fileUtil.normalizeName('name_other-one_extra-more')).to.be.equal('nameOtherOneExtraMore');
+      expect(fileUtil.normalizeName('na_off-one_two-three')).to.be.equal('naOffOneTwoThree');
     });
   });
 
@@ -39,6 +39,7 @@ describe('file Util module', () => {
       fileUtil.loaddirSync(sampleFolder, '.js', [], (err, file, filePath) => {
         // to make sure it is a file
         const stat = fs.statSync(filePath);
+        // eslint-disable-next-line no-unused-expressions
         expect(stat).to.not.be.undefined;
         filePathList.push(filePath);
       });
@@ -60,6 +61,7 @@ describe('file Util module', () => {
       const filePathList = [];
       fileUtil.loaddirSync(sampleFolder, '.unit.js', [], (err, file, filePath) => {
         const stat = fs.statSync(filePath);
+        // eslint-disable-next-line no-unused-expressions
         expect(stat).to.not.be.undefined;
         filePathList.push(filePath);
       });
@@ -74,6 +76,7 @@ describe('file Util module', () => {
       const filePathList = [];
       fileUtil.loaddirSync(sampleFolder, '.js', ['file1.unit.js'], (err, file, filePath) => {
         const stat = fs.statSync(filePath);
+        // eslint-disable-next-line no-unused-expressions
         expect(stat).to.not.be.undefined;
         filePathList.push(filePath);
       });
@@ -88,6 +91,5 @@ describe('file Util module', () => {
       expect(filePathList).to.include(`${sampleFolder}/folder2/folder2_1/file2.js`);
       done();
     });
-
   });
 });
