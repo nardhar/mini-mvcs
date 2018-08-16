@@ -8,7 +8,9 @@ const templater = require('../../../util/templater');
 const crudControllerDefinition = require('../../../crud/crud-controller');
 
 const withTransactionMock = (fun, isTransactional = true) => {
-  return isTransactional ? Promise.resolve(fun()) : Promise.resolve(fun());
+  return isTransactional
+    ? fun().then((result) => { return { ...result, wasTransactional: true }; })
+    : Promise.resolve(fun());
 };
 
 const bookServiceMock = {
@@ -57,6 +59,7 @@ describe('CRUD Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body).to.have.property('rows');
           expect(res.body).to.have.property('count');
+          expect(res.body).to.not.have.property('wasTransactional');
           expect(res.status).to.be.equals(200);
           done();
         });
@@ -69,6 +72,7 @@ describe('CRUD Controller', () => {
           if (err) done(err);
           expect(res.body).to.be.an('object');
           expect(res.body).to.have.property('title', 'my little pony');
+          expect(res.body).to.not.have.property('wasTransactional');
           expect(res.status).to.be.equals(200);
           done();
         });
@@ -81,6 +85,7 @@ describe('CRUD Controller', () => {
           if (err) done(err);
           expect(res.body).to.be.an('object');
           expect(res.body).to.have.property('title', 'my created little pony');
+          expect(res.body).to.have.property('wasTransactional', true);
           expect(res.status).to.be.equals(201);
           done();
         });
@@ -93,6 +98,7 @@ describe('CRUD Controller', () => {
           if (err) done(err);
           expect(res.body).to.be.an('object');
           expect(res.body).to.have.property('title', 'my updated little pony');
+          expect(res.body).to.have.property('wasTransactional', true);
           expect(res.status).to.be.equals(200);
           done();
         });
@@ -105,6 +111,7 @@ describe('CRUD Controller', () => {
           if (err) done(err);
           expect(res.body).to.be.an('object');
           expect(res.body).to.have.property('title', 'my deleted little pony');
+          expect(res.body).to.have.property('wasTransactional', true);
           expect(res.status).to.be.equals(200);
           done();
         });
