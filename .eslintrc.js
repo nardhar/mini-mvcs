@@ -2,7 +2,8 @@ module.exports = {
   "extends": "airbnb-base",
   "env": {
     "es6": true,
-    "node": true
+    "node": true,
+    "mocha": true
   },
   "rules": {
     "arrow-body-style": ["error", "always"],
