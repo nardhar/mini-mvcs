@@ -86,8 +86,10 @@ module.exports = (config, models) => {
 
   // it loads a really simple middleware error
   app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
+    // TODO: add an actual logger library
     console.error(err.stack); // eslint-disable-line no-console
-    return res.status(400).json({});
+    // TODO: upgrade to an actual error handler
+    return res.status(req.method === 'get' ? 404 : 400).json({ error: err.message });
     // here i was trying to add an error handler
     // errors.handleError(err).then((httpError) => {
     //   return res.customRestFailure(httpError.data, {

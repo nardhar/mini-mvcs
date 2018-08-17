@@ -35,13 +35,8 @@ describe('file Util module', () => {
     const sampleFolder = path.resolve(__dirname, './loaddirSyncSample');
 
     it('should load all files in all folders', (done) => {
-      const filePathList = [];
-      fileUtil.loaddirSync(sampleFolder, '.js', [], (err, file, filePath) => {
-        // to make sure it is a file
-        const stat = fs.statSync(filePath);
-        // eslint-disable-next-line no-unused-expressions
-        expect(stat).to.not.be.undefined;
-        filePathList.push(filePath);
+      const filePathList = fileUtil.loaddirSync(sampleFolder, '.js', []).map((fileObject) => {
+        return fileObject.path;
       });
       expect(filePathList).to.have.length(10);
       expect(filePathList).to.include(`${sampleFolder}/fileA.unit.js`);
@@ -58,12 +53,8 @@ describe('file Util module', () => {
     });
 
     it('should load all .unit files in all folders', (done) => {
-      const filePathList = [];
-      fileUtil.loaddirSync(sampleFolder, '.unit.js', [], (err, file, filePath) => {
-        const stat = fs.statSync(filePath);
-        // eslint-disable-next-line no-unused-expressions
-        expect(stat).to.not.be.undefined;
-        filePathList.push(filePath);
+      const filePathList = fileUtil.loaddirSync(sampleFolder, '.unit.js', []).map((fileObject) => {
+        return fileObject.path;
       });
       expect(filePathList).to.have.length(3);
       expect(filePathList).to.include(`${sampleFolder}/fileA.unit.js`);
@@ -73,12 +64,12 @@ describe('file Util module', () => {
     });
 
     it('should load all files in all folders but ignore fileA.unit.js', (done) => {
-      const filePathList = [];
-      fileUtil.loaddirSync(sampleFolder, '.js', ['file1.unit.js'], (err, file, filePath) => {
-        const stat = fs.statSync(filePath);
-        // eslint-disable-next-line no-unused-expressions
-        expect(stat).to.not.be.undefined;
-        filePathList.push(filePath);
+      const filePathList = fileUtil.loaddirSync(
+        sampleFolder,
+        '.js',
+        ['file1.unit.js'],
+      ).map((fileObject) => {
+        return fileObject.path;
       });
       expect(filePathList).to.have.length(8);
       expect(filePathList).to.include(`${sampleFolder}/fileA.unit.js`);
