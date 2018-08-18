@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const express = require('express');
 const request = require('supertest');
+// TODO: this should be mocked
 const templater = require('../../../util/templater');
 
 // NOTE: sequelize-mock is not working right, or at least it does not emulates a database state

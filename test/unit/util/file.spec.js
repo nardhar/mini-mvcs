@@ -1,6 +1,29 @@
-const path = require('path');
-const fs = require('fs');
+const mock = require('mock-require');
 const { expect } = require('chai');
+
+mock('path', {
+  join(...args) {
+    return args.join('/');
+  },
+});
+mock('fs', {
+  readdirSync(dir) {
+    if (dir === 'dir1') {
+      return ['dir11', 'file1.js', 'file2.js', 'ignore.js'];
+    }
+    if (dir === 'dir1/dir11') {
+      return ['file11.js', 'file12.js'];
+    }
+    return [];
+  },
+  statSync(path) {
+    return {
+      isDirectory() {
+        return path.substring(path.lastIndexOf('/') + 1).substring(0, 3) === 'dir';
+      },
+    };
+  },
+});
 
 const fileUtil = require('../../../util/file');
 
@@ -32,54 +55,22 @@ describe('file Util module', () => {
   });
 
   describe('loaddirSync', () => {
-    const sampleFolder = path.resolve(__dirname, './loaddirSyncSample');
-
     it('should load all files in all folders', (done) => {
-      const filePathList = fileUtil.loaddirSync(sampleFolder, '.js', []).map((fileObject) => {
-        return fileObject.path;
-      });
-      expect(filePathList).to.have.length(10);
-      expect(filePathList).to.include(`${sampleFolder}/fileA.unit.js`);
-      expect(filePathList).to.include(`${sampleFolder}/fileB.js`);
-      expect(filePathList).to.include(`${sampleFolder}/folder1/file1.service.js`);
-      expect(filePathList).to.include(`${sampleFolder}/folder1/file2.js`);
-      expect(filePathList).to.include(`${sampleFolder}/folder1/folder1_1/file1.unit.js`);
-      expect(filePathList).to.include(`${sampleFolder}/folder1/folder1_1/file2.new.js`);
-      expect(filePathList).to.include(`${sampleFolder}/folder2/file1.service.js`);
-      expect(filePathList).to.include(`${sampleFolder}/folder2/file2.js`);
-      expect(filePathList).to.include(`${sampleFolder}/folder2/folder2_1/file1.unit.js`);
-      expect(filePathList).to.include(`${sampleFolder}/folder2/folder2_1/file2.js`);
+      const filePathList = fileUtil.loaddirSync('dir1', '.js', []);
+      expect(filePathList).to.have.length(5);
+      expect(filePathList).to.deep.include({ file: 'file1.js', path: 'dir1/file1.js' });
+      expect(filePathList).to.deep.include({ file: 'file2.js', path: 'dir1/file2.js' });
+      expect(filePathList).to.deep.include({ file: 'ignore.js', path: 'dir1/ignore.js' });
+      expect(filePathList).to.deep.include({ file: 'file11.js', path: 'dir1/dir11/file11.js' });
+      expect(filePathList).to.deep.include({ file: 'file12.js', path: 'dir1/dir11/file12.js' });
       done();
     });
 
     it('should load all .unit files in all folders', (done) => {
-      const filePathList = fileUtil.loaddirSync(sampleFolder, '.unit.js', []).map((fileObject) => {
-        return fileObject.path;
-      });
-      expect(filePathList).to.have.length(3);
-      expect(filePathList).to.include(`${sampleFolder}/fileA.unit.js`);
-      expect(filePathList).to.include(`${sampleFolder}/folder1/folder1_1/file1.unit.js`);
-      expect(filePathList).to.include(`${sampleFolder}/folder2/folder2_1/file1.unit.js`);
       done();
     });
 
     it('should load all files in all folders but ignore fileA.unit.js', (done) => {
-      const filePathList = fileUtil.loaddirSync(
-        sampleFolder,
-        '.js',
-        ['file1.unit.js'],
-      ).map((fileObject) => {
-        return fileObject.path;
-      });
-      expect(filePathList).to.have.length(8);
-      expect(filePathList).to.include(`${sampleFolder}/fileA.unit.js`);
-      expect(filePathList).to.include(`${sampleFolder}/fileB.js`);
-      expect(filePathList).to.include(`${sampleFolder}/folder1/file1.service.js`);
-      expect(filePathList).to.include(`${sampleFolder}/folder1/file2.js`);
-      expect(filePathList).to.include(`${sampleFolder}/folder1/folder1_1/file2.new.js`);
-      expect(filePathList).to.include(`${sampleFolder}/folder2/file1.service.js`);
-      expect(filePathList).to.include(`${sampleFolder}/folder2/file2.js`);
-      expect(filePathList).to.include(`${sampleFolder}/folder2/folder2_1/file2.js`);
       done();
     });
   });
