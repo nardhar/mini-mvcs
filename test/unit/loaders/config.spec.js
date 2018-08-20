@@ -4,7 +4,7 @@ const { expect } = require('chai');
 
 const config = require('../../../loaders/config');
 
-describe('config Loader', () => {
+describe('Unit Testing config Loader', () => {
   describe('load a config file', () => {
     it('should load a basic config file', (done) => {
       const configFile = config(path.resolve(__dirname, '../../resource/srcSample'));

@@ -3,7 +3,7 @@ const { expect } = require('chai');
 
 const fileUtil = require('../../../util/file');
 
-describe('file Util module', () => {
+describe('Integration Testing file Util module', () => {
   describe('loaddirSync', () => {
     const sampleFolder = path.resolve(__dirname, './loaddirSyncSample');
 

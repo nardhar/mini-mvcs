@@ -2,7 +2,7 @@ const { expect } = require('chai');
 
 const { NotFoundError, ValidationError, FieldError } = require('../../../errors');
 
-describe('errors Api', () => {
+describe('Unit Testing errors Api', () => {
   describe('NotFoundError', () => {
     it('should create an instance', (done) => {
       const err = new NotFoundError('Object', { id: 1 });

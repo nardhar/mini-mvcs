@@ -23,7 +23,7 @@ const extractRoutes = (app) => {
   });
 };
 
-describe('controller Loader', () => {
+describe('Integration Testing controller Loader', () => {
   describe('load a controllers folder', () => {
     const controllerPath = path.resolve(__dirname, './srcSample');
 

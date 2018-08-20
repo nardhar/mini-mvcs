@@ -12,7 +12,7 @@ const BookMock = dbMock.define('book', {
 
 BookMock.associations = {};
 
-describe('CRUD Service', () => {
+describe('Unit Testing CRUD Service', () => {
   describe('Creating a CRUD service', () => {
     it('should have default methods', (done) => {
       const bookCrudService = crudService(BookMock);

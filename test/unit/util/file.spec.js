@@ -27,7 +27,12 @@ mock('fs', {
 
 const fileUtil = require('../../../util/file');
 
-describe('file Util module', () => {
+describe('Unit Testing file Util module', () => {
+  after(() => {
+    mock.stop('fs');
+    mock.stop('path');
+  });
+
   describe('normalizeName', () => {
     it('should not change a single word', () => {
       expect(fileUtil.normalizeName('name')).to.be.equal('name');

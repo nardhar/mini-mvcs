@@ -3,7 +3,7 @@ const { expect } = require('chai');
 
 const serviceLoader = require('../../../loaders/service');
 
-describe('service Loader', () => {
+describe('Integration Testing service Loader', () => {
   describe('load a services folder', () => {
     const servicePath = path.resolve(__dirname, './srcSample');
 

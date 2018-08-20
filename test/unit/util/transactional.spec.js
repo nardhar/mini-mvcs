@@ -15,7 +15,7 @@ const withTransaction = transactional({
   },
 });
 
-describe('Transactional Util module', () => {
+describe('Unit Testing Transactional Util module', () => {
   it('should execute a function transactionally by default', (done) => {
     withTransaction(() => {
       return Promise.resolve({});

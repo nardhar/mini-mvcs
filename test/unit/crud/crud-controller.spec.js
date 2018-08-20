@@ -32,7 +32,7 @@ const bookServiceMock = {
   },
 };
 
-describe('CRUD Controller', () => {
+describe('Unit Testing CRUD Controller', () => {
   const crudController = crudControllerDefinition(withTransactionMock);
 
   describe('Generation of default methods', () => {
