@@ -1,38 +1,33 @@
-const mock = require('mock-require');
+const proxyQuire = require('proxyquire-2');
 const { expect } = require('chai');
 
-mock('path', {
-  join(...args) {
-    return args.join('/');
+const fileUtil = proxyQuire('../../../util/file', {
+  fs: {
+    readdirSync(dir) {
+      if (dir === 'dir1') {
+        return ['dir11', 'file1.js', 'file2.js', 'ignore.js'];
+      }
+      if (dir === 'dir1/dir11') {
+        return ['file11.js', 'file12.js'];
+      }
+      return [];
+    },
+    statSync(path) {
+      return {
+        isDirectory() {
+          return path.substring(path.lastIndexOf('/') + 1).substring(0, 3) === 'dir';
+        },
+      };
+    },
+  },
+  path: {
+    join(...args) {
+      return args.join('/');
+    },
   },
 });
-mock('fs', {
-  readdirSync(dir) {
-    if (dir === 'dir1') {
-      return ['dir11', 'file1.js', 'file2.js', 'ignore.js'];
-    }
-    if (dir === 'dir1/dir11') {
-      return ['file11.js', 'file12.js'];
-    }
-    return [];
-  },
-  statSync(path) {
-    return {
-      isDirectory() {
-        return path.substring(path.lastIndexOf('/') + 1).substring(0, 3) === 'dir';
-      },
-    };
-  },
-});
-
-const fileUtil = require('../../../util/file');
 
 describe('Unit Testing file Util module', () => {
-  after(() => {
-    mock.stop('fs');
-    mock.stop('path');
-  });
-
   describe('normalizeName', () => {
     it('should not change a single word', () => {
       expect(fileUtil.normalizeName('name')).to.be.equal('name');

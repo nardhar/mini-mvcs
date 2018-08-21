@@ -1,7 +1,10 @@
+const proxyQuire = require('proxyquire-2');
 const path = require('path');
+const fs = require('fs');
 const { expect } = require('chai');
 
-const fileUtil = require('../../../util/file');
+// resetting the proxyQuire for util/file mocked libs
+const fileUtil = proxyQuire('../../../util/file', { fs, path });
 
 describe('Integration Testing file Util module', () => {
   describe('loaddirSync', () => {
