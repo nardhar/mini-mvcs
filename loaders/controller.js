@@ -3,7 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const templater = require('../util/templater');
-const fileUtil = require('../util/file');
+const { loaddirSync } = require('../util/file');
 const serviceLoader = require('./service');
 
 module.exports = (config, models) => {
@@ -51,7 +51,7 @@ module.exports = (config, models) => {
   // requires the app middlewares
   const configMiddleware = config.middleware || {};
   const middlewareList = [];
-  fileUtil.loaddirSync(
+  loaddirSync(
     path.resolve(config.appPath, configMiddleware.dir || './middlewares'),
     `${configMiddleware.suffix || '.middleware'}.js`,
     configMiddleware.ignore || [],
@@ -71,14 +71,14 @@ module.exports = (config, models) => {
 
   // it loads the controllers
   const configController = config.controller || {};
-  fileUtil.loaddirSync(
+  loaddirSync(
     path.resolve(config.appPath, configController.dir || './controllers'),
     `${configController.suffix || '.controller'}.js`,
     configController.ignore || [],
-    (err, file, filePath) => {
-      require(filePath.substr(0, filePath.lastIndexOf('.')))(router, services);
-    },
-  );
+  )
+  .forEach((controllerFile) => {
+    require(controllerFile.path.substr(0, controllerFile.path.lastIndexOf('.')))(router, services);
+  });
 
   // it loads the router into the app
   const configApi = config.api || {};

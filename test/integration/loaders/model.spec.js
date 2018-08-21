@@ -1,7 +1,8 @@
 const path = require('path');
 const { expect } = require('chai');
+const proxyQuire = require('proxyquire-2');
 
-const modelLoader = require('../../../loaders/model');
+const modelLoader = proxyQuire('../../../loaders/model', { path });
 
 /**
  * Testing the models loader, the database params are not actually used, it is just for creating
@@ -9,7 +10,7 @@ const modelLoader = require('../../../loaders/model');
  */
 describe('Integration Testing model Loader', () => {
   describe('load a models folder', () => {
-    const modelPath = path.resolve(__dirname, './srcSample');
+    const modelPath = path.resolve(__dirname, '../../resource/srcSample');
 
     it('should load a models folder with default options', (done) => {
       const models = modelLoader({

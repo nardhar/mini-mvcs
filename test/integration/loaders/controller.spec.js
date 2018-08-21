@@ -1,7 +1,10 @@
 const path = require('path');
 const { expect } = require('chai');
+const proxyQuire = require('proxyquire-2');
 
-const controllerLoader = require('../../../loaders/controller');
+const controllerLoader = proxyQuire('../../../loaders/controller', { path });
+
+// const controllerLoader = require('../../../loaders/controller');
 
 const extractRoutes = (app) => {
   // eslint-disable-next-line no-underscore-dangle
@@ -25,7 +28,7 @@ const extractRoutes = (app) => {
 
 describe('Integration Testing controller Loader', () => {
   describe('load a controllers folder', () => {
-    const controllerPath = path.resolve(__dirname, './srcSample');
+    const controllerPath = path.resolve(__dirname, '../../resource/srcSample');
 
     it('should load a controllers folder with default options', (done) => {
       const controllers = controllerLoader({
@@ -34,7 +37,7 @@ describe('Integration Testing controller Loader', () => {
       const routes = extractRoutes(controllers);
 
       // double _all for the OPTIONS middleware and the added in the current app
-      expect(routes).to.deep.include({ route: '*', methods: ['_all', '_all'] });
+      expect(routes).to.deep.include({ route: '*', methods: ['_all'] });
       expect(routes).to.deep.include({ route: '/book', methods: ['get', 'post'] });
       expect(routes).to.deep.include({ route: '/book/:id', methods: ['get', 'put'] });
       done();

@@ -1,6 +1,6 @@
 const path = require('path');
 const Sequelize = require('sequelize');
-const fileUtil = require('../util/file');
+const { loaddirSync } = require('../util/file');
 
 const db = {};
 
@@ -25,27 +25,27 @@ module.exports = (config) => {
     );
 
   const configModel = config.model || {};
-  fileUtil.loaddirSync(
+  loaddirSync(
     path.resolve(config.appPath, configModel.dir || './models'),
     `${configModel.suffix || ''}.js`,
     configModel.ignore || [],
-    (err, file, filePath) => {
-      const model = sequelize.import(filePath);
-      db[model.name] = model;
-      // building the fake associator
-      fakeDb[model.name] = Object.keys(associationList).reduce((acc, associationType) => {
-        return Object.assign({}, acc, {
-          [associationType]: (model2, options) => {
-            associationList[associationType].push({
-              model1: model.name,
-              model2: model2.name,
-              options,
-            });
-          },
-        });
-      }, { name: model.name });
-    },
-  );
+  )
+  .forEach((modelFile) => {
+    const model = sequelize.import(modelFile.path);
+    db[model.name] = model;
+    // building the fake associator
+    fakeDb[model.name] = Object.keys(associationList).reduce((acc, associationType) => {
+      return Object.assign({}, acc, {
+        [associationType]: (model2, options) => {
+          associationList[associationType].push({
+            model1: model.name,
+            model2: model2.name,
+            options,
+          });
+        },
+      });
+    }, { name: model.name });
+  });
 
   Object.keys(db).forEach((modelName) => {
     if (db[modelName].associate) {

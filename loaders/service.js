@@ -1,21 +1,22 @@
 const path = require('path');
-const fileUtil = require('../util/file');
+const { loaddirSync, normalizeName } = require('../util/file');
 
 module.exports = (config, models) => {
   const services = {};
 
   // load the app services
   const configService = config.service || {};
-  fileUtil.loaddirSync(
+  loaddirSync(
     path.resolve(config.appPath, configService.dir || './services'),
     `${configService.suffix || '.service'}.js`,
     configService.ignore || [],
-    (err, file, filePath) => {
-      const serviceName = fileUtil.normalizeName(file.substr(0, file.indexOf('.')));
-      services[serviceName] =
-        require(filePath.substr(0, filePath.lastIndexOf('.')))(services, models);
-    },
-  );
+  )
+  // using a forEach because we need the same services object as a parameter for each object member
+  .forEach((serviceFile) => {
+    const serviceName = normalizeName(serviceFile.file.substr(0, serviceFile.file.indexOf('.')));
+    services[serviceName] =
+      require(serviceFile.path.substr(0, serviceFile.path.lastIndexOf('.')))(services, models);
+  });
 
   return services;
 };

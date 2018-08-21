@@ -1,11 +1,12 @@
 const path = require('path');
 const { expect } = require('chai');
+const proxyQuire = require('proxyquire-2');
 
-const serviceLoader = require('../../../loaders/service');
+const serviceLoader = proxyQuire('../../../loaders/service', { path });
 
 describe('Integration Testing service Loader', () => {
   describe('load a services folder', () => {
-    const servicePath = path.resolve(__dirname, './srcSample');
+    const servicePath = path.resolve(__dirname, '../../resource/srcSample');
 
     it('should load a services folder with default options', (done) => {
       const services = serviceLoader({ appPath: servicePath }, {});
