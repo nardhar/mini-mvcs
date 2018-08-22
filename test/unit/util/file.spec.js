@@ -1,31 +1,4 @@
 const { expect } = require('chai');
-// const proxyQuire = require('proxyquire-2');
-//
-// const fileUtil = proxyQuire('../../../util/file', {
-//   fs: {
-//     readdirSync(dir) {
-//       if (dir === 'dir1') {
-//         return ['dir11', 'file1.js', 'file2.js', 'ignore.js'];
-//       }
-//       if (dir === 'dir1/dir11') {
-//         return ['file11.js', 'file12.js'];
-//       }
-//       return [];
-//     },
-//     statSync(path) {
-//       return {
-//         isDirectory() {
-//           return path.substring(path.lastIndexOf('/') + 1).substring(0, 3) === 'dir';
-//         },
-//       };
-//     },
-//   },
-//   path: {
-//     join(...args) {
-//       return args.join('/');
-//     },
-//   },
-// });
 
 const rewiremock = require('rewiremock').default;
 
@@ -102,11 +75,21 @@ describe('Unit Testing file Util module', () => {
       done();
     });
 
-    it('should load all .unit files in all folders', (done) => {
+    it('should load all files that end with `1.js` in all folders', (done) => {
+      const filePathList = fileUtil.loaddirSync('dir1', '1.js', []);
+      expect(filePathList).to.have.length(2);
+      expect(filePathList).to.deep.include({ file: 'file1.js', path: 'dir1/file1.js' });
+      expect(filePathList).to.deep.include({ file: 'file11.js', path: 'dir1/dir11/file11.js' });
       done();
     });
 
-    it('should load all files in all folders but ignore fileA.unit.js', (done) => {
+    it('should load all files in all folders but ignore ignore.js', (done) => {
+      const filePathList = fileUtil.loaddirSync('dir1', '.js', ['ignore.js']);
+      expect(filePathList).to.have.length(4);
+      expect(filePathList).to.deep.include({ file: 'file1.js', path: 'dir1/file1.js' });
+      expect(filePathList).to.deep.include({ file: 'file2.js', path: 'dir1/file2.js' });
+      expect(filePathList).to.deep.include({ file: 'file11.js', path: 'dir1/dir11/file11.js' });
+      expect(filePathList).to.deep.include({ file: 'file12.js', path: 'dir1/dir11/file12.js' });
       done();
     });
   });
