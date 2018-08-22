@@ -1,5 +1,4 @@
 const { expect } = require('chai');
-
 const rewiremock = require('rewiremock').default;
 
 rewiremock('fs').with({
