@@ -8,10 +8,13 @@ module.exports = (appPath) => {
   const configDatabase = config.database || {};
   const configDatabaseSync = configDatabase.sync || {};
 
-  const database = Object.assign({}, configDatabase, {
-    sync: { force: process.env.FORCE || configDatabaseSync.force },
-    operatorsAliases: Op,
-  });
-
-  return Object.assign({}, config, { appPath, database });
+  return {
+    ...config,
+    appPath,
+    database: {
+      ...configDatabase,
+      sync: { force: process.env.FORCE || configDatabaseSync.force },
+      operatorsAliases: Op,
+    },
+  };
 };
