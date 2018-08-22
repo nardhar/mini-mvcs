@@ -1,10 +1,10 @@
 const path = require('path');
 const { expect } = require('chai');
-const proxyQuire = require('proxyquire-2');
+// const proxyQuire = require('proxyquire-2');
 
-const controllerLoader = proxyQuire('../../../loaders/controller', { path });
+// const controllerLoader = proxyQuire('../../../loaders/controller', { path });
 
-// const controllerLoader = require('../../../loaders/controller');
+const controllerLoader = require('../../../loaders/controller');
 
 const extractRoutes = (app) => {
   // eslint-disable-next-line no-underscore-dangle
@@ -14,9 +14,10 @@ const extractRoutes = (app) => {
         const route = middleware2.route.path;
         const methods = Object.keys(middleware2.route.methods);
 
-        return Object.assign({}, acc2, {
-          [route]: route in acc2 ? acc2[route].concat(methods) : methods,
-        });
+        return {
+          ...acc2,
+          [route]: (acc2[route] || []).concat(methods),
+        };
       }, acc);
     }
     return acc;

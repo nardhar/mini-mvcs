@@ -1,8 +1,10 @@
 const path = require('path');
 const { expect } = require('chai');
-const proxyQuire = require('proxyquire-2');
+// const proxyQuire = require('proxyquire-2');
 
-const serviceLoader = proxyQuire('../../../loaders/service', { path });
+// const serviceLoader = proxyQuire('../../../loaders/service', { path });
+
+const serviceLoader = require('../../../loaders/service');
 
 describe('Integration Testing service Loader', () => {
   describe('load a services folder', () => {

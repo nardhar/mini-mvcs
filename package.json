@@ -36,6 +36,7 @@
     "eslint-plugin-import": "^2.11.0",
     "mocha": "^5.1.1",
     "proxyquire-2": "^1.0.7",
+    "rewiremock": "^3.7.7",
     "sequelize-mock": "^0.10.2",
     "supertest": "^3.1.0"
   }

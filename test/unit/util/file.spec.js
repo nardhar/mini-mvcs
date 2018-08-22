@@ -1,33 +1,69 @@
-const proxyQuire = require('proxyquire-2');
 const { expect } = require('chai');
+// const proxyQuire = require('proxyquire-2');
+//
+// const fileUtil = proxyQuire('../../../util/file', {
+//   fs: {
+//     readdirSync(dir) {
+//       if (dir === 'dir1') {
+//         return ['dir11', 'file1.js', 'file2.js', 'ignore.js'];
+//       }
+//       if (dir === 'dir1/dir11') {
+//         return ['file11.js', 'file12.js'];
+//       }
+//       return [];
+//     },
+//     statSync(path) {
+//       return {
+//         isDirectory() {
+//           return path.substring(path.lastIndexOf('/') + 1).substring(0, 3) === 'dir';
+//         },
+//       };
+//     },
+//   },
+//   path: {
+//     join(...args) {
+//       return args.join('/');
+//     },
+//   },
+// });
 
-const fileUtil = proxyQuire('../../../util/file', {
-  fs: {
-    readdirSync(dir) {
-      if (dir === 'dir1') {
-        return ['dir11', 'file1.js', 'file2.js', 'ignore.js'];
-      }
-      if (dir === 'dir1/dir11') {
-        return ['file11.js', 'file12.js'];
-      }
-      return [];
-    },
-    statSync(path) {
-      return {
-        isDirectory() {
-          return path.substring(path.lastIndexOf('/') + 1).substring(0, 3) === 'dir';
-        },
-      };
-    },
+const rewiremock = require('rewiremock').default;
+
+rewiremock('fs').with({
+  readdirSync(dir) {
+    if (dir === 'dir1') {
+      return ['dir11', 'file1.js', 'file2.js', 'ignore.js'];
+    }
+    if (dir === 'dir1/dir11') {
+      return ['file11.js', 'file12.js'];
+    }
+    return [];
   },
-  path: {
-    join(...args) {
-      return args.join('/');
-    },
+  statSync(path) {
+    return {
+      isDirectory() {
+        return path.substring(path.lastIndexOf('/') + 1).substring(0, 3) === 'dir';
+      },
+    };
   },
 });
 
+rewiremock('path').with({
+  join(...args) {
+    return args.join('/');
+  },
+});
+
+let fileUtil;
+
 describe('Unit Testing file Util module', () => {
+  before(() => {
+    rewiremock.enable();
+    fileUtil = require('../../../util/file');
+  });
+
+  after(() => { rewiremock.disable(); });
+
   describe('normalizeName', () => {
     it('should not change a single word', () => {
       expect(fileUtil.normalizeName('name')).to.be.equal('name');
