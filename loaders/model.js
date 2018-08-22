@@ -35,7 +35,8 @@ module.exports = (config) => {
     db[model.name] = model;
     // building the fake associator
     fakeDb[model.name] = Object.keys(associationList).reduce((acc, associationType) => {
-      return Object.assign({}, acc, {
+      return {
+        ...acc,
         [associationType]: (model2, options) => {
           associationList[associationType].push({
             model1: model.name,
@@ -43,7 +44,7 @@ module.exports = (config) => {
             options,
           });
         },
-      });
+      };
     }, { name: model.name });
   });
 
