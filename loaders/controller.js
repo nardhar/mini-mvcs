@@ -35,45 +35,60 @@ module.exports = (config, models) => {
   // creates the express router
   const router = express.Router();
 
-  // loads the middleware
-  router.all(
-    '*',
-    (req, res, next) => {
+  // requires the app middlewares
+  const configMiddleware = config.middleware || {};
+  loaddirSync(
+    path.resolve(config.appPath, 'dir' in configMiddleware ? configMiddleware.dir : 'middlewares'),
+    `${'suffix' in configMiddleware ? configMiddleware.suffix : '.middleware'}.js`,
+    configMiddleware.ignore || [],
+  )
+  .map((middlewareFile) => {
+    return require(middlewareFile.path.substr(0, middlewareFile.path.lastIndexOf('.')))(services);
+  })
+  // adds the OPTIONS middleware
+  .concat({
+    order: 0,
+    callback: (req, res, next) => {
+      // it will jump all the middlewares in the same path if method === 'OPTIONS'
       if (req.method === 'OPTIONS') {
-        // here it exits the other middlewares
         next('route');
       } else {
         next();
       }
     },
-  );
-
-  // requires the app middlewares
-  const configMiddleware = config.middleware || {};
-  const middlewareList = [];
-  loaddirSync(
-    path.resolve(config.appPath, configMiddleware.dir || './middlewares'),
-    `${configMiddleware.suffix || '.middleware'}.js`,
-    configMiddleware.ignore || [],
-    (err, file, filePath) => {
-      const middleware = require(filePath.substr(0, filePath.lastIndexOf('.')))(services);
-      middlewareList.push(middleware);
-    },
-  );
-
+  })
   // it orders the middlewares and loads them in the router
-  middlewareList.sort((a, b) => {
+  .sort((a, b) => {
     return (a.order || 100) - (b.order || 100);
   })
-  .forEach((middleware) => {
-    router.all('*', middleware.callback);
+  .reduce((middlewareGroupList, middleware) => {
+    // if no path is defined then it uses the general path: '*'
+    const middlewarePath = middleware.path || '*';
+    const idx = middlewareGroupList.findIndexOf((group) => {
+      return group.path === middlewarePath;
+    });
+
+    if (idx < 0) {
+      middlewareGroupList.push({
+        path: middlewarePath,
+        middlewareList: [middleware],
+      });
+      return middlewareGroupList;
+    }
+
+    middlewareGroupList[idx].middlewareList.push(middleware);
+
+    return middlewareGroupList;
+  }, [])
+  .forEach((middlewareGroupList) => {
+    router.use(middlewareGroupList.path, middlewareGroupList.middlewareList);
   });
 
   // it loads the controllers
   const configController = config.controller || {};
   loaddirSync(
-    path.resolve(config.appPath, configController.dir || './controllers'),
-    `${configController.suffix || '.controller'}.js`,
+    path.resolve(config.appPath, 'dir' in configController ? configController.dir : 'controllers'),
+    `${'suffix' in configController ? configController.suffix : '.controller'}.js`,
     configController.ignore || [],
   )
   .forEach((controllerFile) => {
