@@ -2,19 +2,19 @@ const path = require('path');
 const Sequelize = require('sequelize');
 const { loaddirSync } = require('../util/file');
 
-const db = {};
-
-const fakeDb = {};
-
-// the order to execute associations
-const associationList = {
-  belongsTo: [],
-  hasOne: [],
-  belongsToMany: [],
-  hasMany: [],
-};
-
 module.exports = (config) => {
+  const db = {};
+
+  const fakeDb = {};
+
+  // the order to execute associations
+  const associationList = {
+    belongsTo: [],
+    hasOne: [],
+    belongsToMany: [],
+    hasMany: [],
+  };
+
   const sequelize = config.database.use_env_variable
     ? new Sequelize(process.env[config.database.use_env_variable], config.database.database)
     : new Sequelize(

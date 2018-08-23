@@ -1,4 +1,3 @@
-/* eslint class-methods-use-this: 0 */
 const { sep } = require('path');
 
 const capitalize = (text) => {
@@ -14,13 +13,27 @@ class Model {
     this.hasOneModels = [];
     this.belongsToManyModels = [];
     this.hasManyModels = [];
-  }
-
-  associate(models) {
     if (this.name === 'Book') {
-      models.Book.belongsTo(models.Author, { as: 'author' });
-      models.Book.belongsToMany(models.Tag, { as: 'bookTags' });
-      models.Book.hasOne(models.Isbn, { as: 'isbn' });
+      this.associate = (models) => {
+        models.Book.belongsTo(models.Author, { as: 'author' });
+        models.Book.belongsToMany(models.Tag, { as: 'bookTags' });
+        models.Book.hasOne(models.Isbn, { as: 'isbn' });
+      };
+    }
+    if (this.name === 'Author') {
+      this.associate = (models) => {
+        models.Author.hasMany(models.Book, { as: 'books' });
+      };
+    }
+    if (this.name === 'Tag') {
+      this.associate = (models) => {
+        models.Tag.belongsToMany(models.Book, { as: 'bookTags' });
+      };
+    }
+    if (this.name === 'Isbn') {
+      this.associate = (models) => {
+        models.Isbn.belongsTo(models.Book, { as: 'book' });
+      };
     }
   }
 
@@ -47,10 +60,13 @@ class Sequelize {
     this.username = username;
     this.password = password;
     this.options = options;
+    this.models = [];
   }
 
   import(modelPath) {
-    return new Model(modelPath);
+    const importedModel = new Model(modelPath);
+    this.models.push(importedModel);
+    return importedModel;
   }
 }
 
