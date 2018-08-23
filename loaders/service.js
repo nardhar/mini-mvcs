@@ -7,15 +7,15 @@ module.exports = (config, models) => {
   // load the app services
   const configService = config.service || {};
   loaddirSync(
-    path.resolve(config.appPath, configService.dir || './services'),
-    `${configService.suffix || '.service'}.js`,
+    path.resolve(config.appPath, 'dir' in configService ? configService.dir : 'services'),
+    `${'suffix' in configService ? configService.suffix : '.service'}.js`,
     configService.ignore || [],
   )
   // using a forEach because we need the same services object as a parameter for each object member
   .forEach((serviceFile) => {
     const serviceName = normalizeName(serviceFile.file.substr(0, serviceFile.file.indexOf('.')));
-    services[serviceName] =
-      require(serviceFile.path.substr(0, serviceFile.path.lastIndexOf('.')))(services, models);
+    const servicePath = serviceFile.path.substr(0, serviceFile.path.lastIndexOf('.'));
+    services[serviceName] = require(servicePath)(services, models);
   });
 
   return services;
