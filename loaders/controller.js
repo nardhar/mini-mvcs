@@ -55,9 +55,12 @@ module.exports = (config, models) => {
 
   // loading a not so simple error handler
   const configError = config.error || {};
-  // using a configured logger or a simple default one (console.error)
+  // loads the configured logger or a simple default one (console.error)
   const configErrorLogger = configError.logger || console.error; // eslint-disable-line no-console
+  // loads the configured error status codes
+  // (if a custom error is created then it should be added in the error.codes section, document it!)
   const configErrorCodes = configError.codes || {};
+  // ...for merging with the default ones
   const errorCodes = {
     ...{
       ValidationError: 412,
@@ -67,6 +70,7 @@ module.exports = (config, models) => {
     },
     configErrorCodes,
   };
+  // loads the configured error renderer or uses a simple default one
   const errorRenderer = configError.renderer || ((err) => {
     return { message: err.message, errors: err.getBody() };
   });
