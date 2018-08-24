@@ -5,7 +5,7 @@ const cors = require('cors');
 const { loaddirSync } = require('../util/file');
 const serviceLoader = require('./service');
 const middlewareLoader = require('./middleware');
-const errors = require('../errors');
+const { ApiError } = require('../errors');
 
 module.exports = (config, models) => {
   // creating the express app
@@ -83,7 +83,7 @@ module.exports = (config, models) => {
     // if no response has already been sent
     if (!res.headersSent) {
       // checks if it is a controlled error
-      if (err instanceof errors.ApiError) {
+      if (err instanceof ApiError) {
         // and finds the corresponding status code for the response
         res.status(errorCodes[err.type] || errorCodes.default).json(errorRenderer(err));
       } else {
