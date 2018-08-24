@@ -5,24 +5,38 @@ class ValidationError extends ApiError {
   constructor(objectName, errors = []) {
     super('ValidationError', `Validation error with "${objectName}"`);
     this.objectName = objectName;
-    this.errors = errors;
+    this.data = errors;
   }
 
   addFieldError(fieldError) {
-    this.errors.push(fieldError);
+    this.data.push(fieldError);
   }
 
   addError(field, code, args = []) {
-    this.errors.push(new FieldError(field, code, args));
+    this.data.push(new FieldError(field, code, args));
   }
 
   hasErrors() {
-    return this.errors.length > 0;
+    return this.data.length > 0;
+  }
+
+  getErrors() {
+    return this.data;
   }
 
   merge(validationError) {
-    validationError.errors.forEach((error) => {
+    validationError.data.forEach((error) => {
       this.addFieldError(error);
+    });
+  }
+
+  getBody() {
+    return this.data.map((error) => {
+      return {
+        field: error.field,
+        code: `${this.objectName}.${error.field}.${error.code}`,
+        args: error.args,
+      };
     });
   }
 }

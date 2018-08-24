@@ -5,6 +5,7 @@ const cors = require('cors');
 const { loaddirSync } = require('../util/file');
 const serviceLoader = require('./service');
 const middlewareLoader = require('./middleware');
+const errors = require('../errors');
 
 module.exports = (config, models) => {
   // creating the express app
@@ -52,26 +53,44 @@ module.exports = (config, models) => {
   const configApi = config.api || {};
   app.use(configApi.main || '/api/v1', router);
 
+  // loading a not so simple error handler
+  const configError = config.error || {};
+  // using a configured logger or a simple default one (console.error)
+  const configErrorLogger = configError.logger || console.error; // eslint-disable-line no-console
+  const configErrorCodes = configError.codes || {};
+  const errorCodes = {
+    ...{
+      ValidationError: 412,
+      NotFoundError: 404,
+      default: 400,
+      internal: 500,
+    },
+    configErrorCodes,
+  };
+  const errorRenderer = configError.renderer || ((err) => {
+    return { message: err.message, errors: err.getBody() };
+  });
+
   // it loads a really simple middleware error
   app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
-    // TODO: add an actual logger library
-    console.error(err.stack); // eslint-disable-line no-console
-    // TODO: upgrade to an actual error handler
-    return res.status(req.method === 'get' ? 404 : 400).json({ error: err.message });
-    // here i was trying to add an error handler
-    // errors.handleError(err).then((httpError) => {
-    //   return res.customRestFailure(httpError.data, {
-    //     status: httpError.statusCode,
-    //     mensaje: httpError.message,
-    //   });
-    // });
-    // // it enables the error stacktrace only in dev
-    // if (app.get('env') === 'development') {
-    //   // eslint-disable-next-line no-console
-    //   console.log(`Error en ${req.originalUrl}`);
-    //   // eslint-disable-next-line no-console
-    //   console.error(err.stack);
-    // }
+    // it always logs the errors
+    configErrorLogger(err);
+
+    // if no response has already been sent
+    if (!res.headersSent) {
+      // checks if it is a controlled error
+      if (err instanceof errors.ApiError) {
+        // and finds the corresponding status code for the response
+        res.status(errorCodes[err.type] || errorCodes.default).json(errorRenderer(err));
+      } else {
+        // if it is not a controlled error, then send a Server error
+        // (some code has thrown an exception)
+        res.status(errorCodes.internal).json(errorRenderer({
+          message: 'Internal Server Error',
+          getBody() { return []; },
+        }));
+      }
+    }
   });
 
   return app;
