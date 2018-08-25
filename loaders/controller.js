@@ -46,6 +46,7 @@ module.exports = (config, models) => {
     configController.ignore || [],
   )
   .forEach((controllerFile) => {
+    // NOTE: refactor a router wrapper for templating the response with status and a custom format
     require(controllerFile.path.substr(0, controllerFile.path.lastIndexOf('.')))(router, services);
   });
 
