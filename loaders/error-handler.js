@@ -22,6 +22,7 @@ module.exports = (config) => {
   const errorRenderer = configError.renderer || ((err) => {
     return { message: err.message, errors: err.getBody() };
   });
+  // NOTE: we could check if errorRenderer is a function
 
   // it returns a really simple middleware error
   return (err, req, res, next) => { // eslint-disable-line no-unused-vars
