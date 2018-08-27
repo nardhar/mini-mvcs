@@ -9,11 +9,11 @@ describe('Unit Testing errors Api', () => {
 
       expect(err).to.be.an('error');
       expect(err).to.have.property('objectName');
-      expect(err).to.have.property('filters');
+      expect(err).to.have.property('data');
       expect(err).to.have.property('message');
       expect(err.objectName).to.equal('Object');
-      expect(err.filters).to.be.an.instanceof(Object);
-      expect(err.filters).to.deep.equal({ id: 1 });
+      expect(err.data).to.be.an.instanceof(Object);
+      expect(err.data).to.deep.equal({ id: 1 });
       expect(err.message).to.equal('Object not found');
       done();
     });
@@ -33,13 +33,13 @@ describe('Unit Testing errors Api', () => {
 
       expect(err).to.be.an('error');
       expect(err).to.have.property('objectName');
-      expect(err).to.have.property('errors');
+      expect(err).to.have.property('data');
       expect(err).to.have.property('message');
       expect(err.hasErrors()).to.equal(false);
       expect(err.objectName).to.equal('Object');
       expect(err.message).to.equal('Validation error with "Object"');
-      expect(err.errors).to.be.an.instanceof(Array);
-      expect(err.errors).to.have.length(0);
+      expect(err.getErrors()).to.be.an.instanceof(Array);
+      expect(err.getErrors()).to.have.length(0);
       done();
     });
 
@@ -50,20 +50,20 @@ describe('Unit Testing errors Api', () => {
 
       expect(err).to.be.an('error');
       expect(err).to.have.property('objectName');
-      expect(err).to.have.property('errors');
+      expect(err).to.have.property('data');
       expect(err).to.have.property('message');
       expect(err.hasErrors()).to.equal(true);
       expect(err.objectName).to.equal('Object');
       expect(err.message).to.equal('Validation error with "Object"');
-      expect(err.errors).to.be.an.instanceof(Array);
-      expect(err.errors).to.have.length(1);
-      expect(err.errors[0]).to.have.property('field');
-      expect(err.errors[0]).to.have.property('code');
-      expect(err.errors[0]).to.have.property('args');
-      expect(err.errors[0].field).to.equal('sampleField');
-      expect(err.errors[0].code).to.equal('sampleCode');
-      expect(err.errors[0].args).to.be.an.instanceof(Array);
-      expect(err.errors[0].args).to.have.length(0);
+      expect(err.getErrors()).to.be.an.instanceof(Array);
+      expect(err.getErrors()).to.have.length(1);
+      expect(err.getErrors()[0]).to.have.property('field');
+      expect(err.getErrors()[0]).to.have.property('code');
+      expect(err.getErrors()[0]).to.have.property('args');
+      expect(err.getErrors()[0].field).to.equal('sampleField');
+      expect(err.getErrors()[0].code).to.equal('sampleCode');
+      expect(err.getErrors()[0].args).to.be.an.instanceof(Array);
+      expect(err.getErrors()[0].args).to.have.length(0);
       done();
     });
 
@@ -75,12 +75,12 @@ describe('Unit Testing errors Api', () => {
       // one way
       err.addError('sampleField', 'sampleCode');
       expect(err.hasErrors()).to.equal(true);
-      expect(err.errors).to.have.length(1);
+      expect(err.getErrors()).to.have.length(1);
 
       // or another
       err.addFieldError(new FieldError('sampleField', 'sampleCode'));
       expect(err.hasErrors()).to.equal(true);
-      expect(err.errors).to.have.length(2);
+      expect(err.getErrors()).to.have.length(2);
 
       done();
     });
@@ -96,12 +96,12 @@ describe('Unit Testing errors Api', () => {
       err1.merge(err2);
 
       expect(err1.hasErrors()).to.equal(true);
-      expect(err1.errors).to.have.length(2);
+      expect(err1.getErrors()).to.have.length(2);
 
-      expect(err1.errors[0].field).to.equal('sampleField1');
-      expect(err1.errors[0].code).to.equal('sampleCode1');
-      expect(err1.errors[1].field).to.equal('sampleField2');
-      expect(err1.errors[1].code).to.equal('sampleCode2');
+      expect(err1.getErrors()[0].field).to.equal('sampleField1');
+      expect(err1.getErrors()[0].code).to.equal('sampleCode1');
+      expect(err1.getErrors()[1].field).to.equal('sampleField2');
+      expect(err1.getErrors()[1].code).to.equal('sampleCode2');
 
       done();
     });

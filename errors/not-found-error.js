@@ -4,7 +4,7 @@ class NotFoundError extends ApiError {
   constructor(objectName, filters, message = '') {
     super('NotFoundError', message || `${objectName} not found`);
     this.objectName = objectName;
-    this.data = this.filters;
+    this.data = filters;
   }
 
   getBody() {
