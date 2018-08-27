@@ -1,8 +1,9 @@
 const { expect } = require('chai');
 const rewiremock = require('rewiremock').default;
 
-class ApiError {
+class ApiError extends Error {
   constructor(type, message = '') {
+    super(message);
     this.type = type;
     this.message = message;
     this.data = null;
@@ -55,15 +56,14 @@ rewiremock('../errors').with({
 });
 
 let errorHandler;
+let result;
+let resMock;
 
 describe('Unit Testing error handler', () => {
   before(() => {
     rewiremock.enable();
     errorHandler = require('../../../loaders/error-handler');
   });
-
-  let resMock;
-  let result;
 
   beforeEach(() => {
     result = {};
