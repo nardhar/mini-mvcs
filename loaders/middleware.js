@@ -41,17 +41,17 @@ module.exports = (config, services) => {
     // if no path is defined then it uses the general path: '*'
     const middlewarePath = middleware.path || '*';
     // searchs its corresponding position in the resulting array
-    const idx = middlewareGroupList.findIndexOf((group) => {
+    const idx = middlewareGroupList.findIndex((group) => {
       // it searches by path
       return group.path === middlewarePath;
     });
 
     // if the group is not found then adds a new item
     if (idx < 0) {
-      middlewareGroupList.push({ path: middlewarePath, middlewareList: [middleware] });
+      middlewareGroupList.push({ path: middlewarePath, middlewareList: [middleware.callback] });
     } else {
       // if it is found then adds it to the middleware list
-      middlewareGroupList[idx].middlewareList.push(middleware);
+      middlewareGroupList[idx].middlewareList.push(middleware.callback);
     }
 
     // and returns the result
