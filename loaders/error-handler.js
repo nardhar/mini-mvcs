@@ -1,6 +1,6 @@
 const { ApiError } = require('../errors');
 
-module.exports = (config) => {
+module.exports = (config = {}) => {
   // loading a not so simple error handler
   const configError = config.error || {};
   // loads the configured logger or a simple default one (console.error)
@@ -16,8 +16,9 @@ module.exports = (config) => {
       default: 400,
       internal: 500,
     },
-    configErrorCodes,
+    ...configErrorCodes,
   };
+
   // loads the configured error renderer or uses a simple default one
   const errorRenderer = configError.renderer || ((err) => {
     return { message: err.message, errors: err.getBody() };
