@@ -5,6 +5,7 @@ const cors = require('cors');
 const { loaddirSync } = require('../util/file');
 const serviceLoader = require('./service');
 const middlewareLoader = require('./middleware');
+const templater = require('../util/templater');
 const errorHandleLoader = require('./error-handler');
 
 module.exports = (config, models) => {
@@ -38,6 +39,9 @@ module.exports = (config, models) => {
     router.use(middlewareGroupList.path, middlewareGroupList.middlewareList);
   });
 
+  // imports the templater
+  const templateRouter = templater(config, router);
+
   // it loads the controllers
   const configController = config.controller || {};
   loaddirSync(
@@ -45,9 +49,9 @@ module.exports = (config, models) => {
     `${'suffix' in configController ? configController.suffix : '.controller'}.js`,
     configController.ignore || [],
   )
-  .forEach((controllerFile) => {
+  .forEach((file) => {
     // NOTE: refactor a router wrapper for templating the response with status and a custom format
-    require(controllerFile.path.substr(0, controllerFile.path.lastIndexOf('.')))(router, services);
+    require(file.path.substr(0, file.path.lastIndexOf('.')))(templateRouter, services);
   });
 
   // it loads the router into the app

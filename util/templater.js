@@ -1,127 +1,62 @@
-const { STATUS_CODES } = require('http');
+const http = require('http');
 
-// default static options
-let staticOptions = {
-  defaultStatusSuccess: 200,
-  defaultStatusFailure: 400,
+// getting all methods for a express.Router
+const httpMethods = http.METHODS ? http.METHODS.map((method) => {
+  // converting to lowercase since router.METHOD expects lowercase methods
+  return method.toLowerCase();
+}) : [];
 
-  getShouldHaveBody: true,
-  getStatusSuccess: 200,
-  getStatusFailure: 404,
-
-  postShouldHaveBody: true,
-  postStatusSuccess: 201,
-  postStatusFailure: 400,
-
-  putShouldHaveBody: true,
-  putStatusSuccess: 200,
-  putStatusFailure: 400,
-
-  patchShouldHaveBody: true,
-  patchStatusSuccess: 200,
-  patchStatusFailure: 400,
-
-  deleteShouldHaveBody: true,
-  deleteStatusSuccess: 200,
-  deleteStatusFailure: 400,
+// default status codes
+const defaultStatusCode = {
+  get: 200,
+  post: 201,
+  put: 200,
+  patch: 200,
+  delete: 204,
+  default: 200,
 };
 
-/**
- * Finds the response status according to the method required and if it is successful or not
- * @param {String} method: Http method
- * @param {Boolean} successful: If the response is a success or a failure
- * @return Integer: The status to be sent in the response
- */
-function findStatus(method, successful) {
-  const successfulValue = successful ? 'Success' : 'Failure';
-  const statusKey = `${method.toLowerCase()}Status${successfulValue}`;
-  // check if staticOptions does not have statusKey key, otherwise returns a default status code
-  return statusKey in staticOptions
-    ? staticOptions[statusKey]
-    : staticOptions[`defaultStatus${successfulValue}`];
-}
-
-/**
- * Response builder with the template function from staticOptions
- * if no template function is sent then the object is sent without transforming
- * @param {Object} object: The object to be rendered as JSON
- * @param {Integer} status: The HTTP status codes
- * @param {Object} responseArgs: Additional response arguments
- * @return {Object}: The object to be sent as the response body
- */
-function buildResponse(req, res, method, successful, object, responseArgs = {}) {
-  // inferes or sets the response status
-  // a custom status could be sent in responseArgs
-  const status = 'status' in responseArgs
-    ? responseArgs.status
-    // testing with the req.method param for generating the corresponding status code
-    : findStatus(method, successful);
-
-  // builds the response body
-  const jsonBody = 'template' in staticOptions
-    ? staticOptions.template(object, { status, message: STATUS_CODES[status] }, responseArgs, req)
-    : object;
-  // builds the corresponding data response as JSON
-  return res.status(status).json(jsonBody);
-}
-
-/**
- * Function for checking if an object is empty
- * An empty array is not treated as empty
- * @param {Object} obj: object for reviewing if should be empty
- * @return {Boolean}: if the object is treated as empty or not
- */
-function isEmpty(obj) {
-  if (obj === null || typeof obj !== 'object') {
-    return true;
-  }
-
-  // if obj is an Array then it does not matter if it has elements or not
-  if (obj instanceof Array) {
-    return false;
-  }
-
-  // checks that at least one key in the object exists as a property
-  return Object.keys(obj).reduce((hasProperty, key) => {
-    return hasProperty && !(key in obj);
-  }, true);
-}
-
-function customRestTemplater(req, res, next) {
-  /**
-   * adding customRest method with two arguments
-   * @param {Object} object: the object to be rendered as final data
-   * @param {Object} responseArgs: the response arguments in case it should not be
-   @ @return {Response}: Response formatted with the buildResponse method
-   */
-  res.customRest = function customRest(object, responseArgs = {}) {
-    // checks if response is successful by reviewing the staticOptions configuration and if the
-    // object sent is treated as empty
-    return buildResponse(
-      req,
-      res,
-      req.method,
-      !staticOptions[`${req.method.toLowerCase()}ShouldHaveBody`] || !isEmpty(object),
-      object,
-      responseArgs,
-    );
-  };
-
-  res.customRestSuccess = function customRestSuccess(object, responseArgs = {}) {
-    return buildResponse(req, res, req.method, true, object, responseArgs);
-  };
-
-  res.customRestFailure = function customRestFailure(object, responseArgs = {}) {
-    return buildResponse(req, res, req.method, false, object, responseArgs);
-  };
-
-  next();
-}
-
-customRestTemplater.options = function optionsFun(options) {
-  if (typeof options === 'object') {
-    staticOptions = Object.assign({}, staticOptions, options);
-  }
+// default templater function that does nothing
+const defaultTemplater = (req, res, body) => {
+  return body;
 };
 
-module.exports = customRestTemplater;
+module.exports = (config, router) => {
+  const configTemplater = config.routerTemplate || {};
+  const statusCode = {
+    ...defaultStatusCode,
+    ...(configTemplater.statusCodes || {}),
+  };
+  const templater = configTemplater.template || defaultTemplater;
+
+  // returning an object that has the same methods as a express.Router
+  return {
+    // returning the express router in case we would want to avoid all the templater stack
+    expressRouter: router,
+    // simple wrappers that just run the router
+    ...['all', 'param', 'route', 'use'].reduce((otherMethods, method) => {
+      return { ...otherMethods, [method]: (...args) => { return router[method](...args); } };
+    }, {}),
+    // actual METHOD wrappers that are expected to be formatted with the templater
+    ...httpMethods.reduce((httpMethodsObject, httpMethod) => {
+      return {
+        ...httpMethodsObject,
+        [httpMethod]: (path, ...args) => {
+          router[httpMethod](path, ...args.slice(0, args.length - 1).concat((req, res, next) => {
+            // wrapping last callback with a Promise in case its result is not a Promise
+            return Promise.resolve(args[args.length - 1](req, res, next))
+            .then((body) => {
+              // will send data if no response was already sent
+              if (!res.headersSent) {
+                // we use the configured status code by the request method
+                res.status(statusCode[req.method] || statusCode.default)
+                .json(templater(req, res, body));
+              }
+            })
+            .catch(next);
+          }));
+        },
+      };
+    }, {}),
+  };
+};

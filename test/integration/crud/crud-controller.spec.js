@@ -1,8 +1,8 @@
+// TODO: tests will not work because of not mocking templater that should replace express.Router()
+
 const { expect } = require('chai');
 const express = require('express');
 const request = require('supertest');
-// TODO: this should be mocked
-const templater = require('../../../util/templater');
 
 // NOTE: sequelize-mock is not working right, or at least it does not emulates a database state
 // maybe a custom sequelize mock should be created or convert all these tests into integration ones
@@ -42,7 +42,6 @@ describe('Unit Testing CRUD Controller', () => {
 
     before(() => {
       app = express();
-      app.use(templater);
 
       router = express.Router();
       app.use('/', router);
@@ -125,7 +124,6 @@ describe('Unit Testing CRUD Controller', () => {
     // this time we reset the app and the router everytime
     beforeEach(() => {
       app = express();
-      app.use(templater);
 
       router = express.Router();
       app.use('/', router);

@@ -30,52 +30,42 @@ module.exports = (withTransaction) => {
     const actions = actionsParam.map(buildActions);
 
     findAction(actions, 'index', (isTransactional) => {
-      router.get(`/${endpoint}`, (req, res, next) => {
+      router.get(`/${endpoint}`, (req) => {
         return withTransaction(() => {
           return crudService.listAndCount(req.query);
-        }, isTransactional)
-        .then(res.customRest)
-        .catch(next);
+        }, isTransactional);
       });
     });
 
     findAction(actions, 'get', (isTransactional) => {
-      router.get(`/${endpoint}/:id`, (req, res, next) => {
+      router.get(`/${endpoint}/:id`, (req) => {
         return withTransaction(() => {
           return crudService.read(req.params.id);
-        }, isTransactional)
-        .then(res.customRest)
-        .catch(next);
+        }, isTransactional);
       });
     });
 
     findAction(actions, 'post', (isTransactional) => {
-      router.post(`/${endpoint}`, (req, res, next) => {
+      router.post(`/${endpoint}`, (req) => {
         return withTransaction(() => {
           return crudService.save(req.body);
-        }, isTransactional)
-        .then(res.customRest)
-        .catch(next);
+        }, isTransactional);
       });
     });
 
     findAction(actions, 'put', (isTransactional) => {
-      router.put(`/${endpoint}/:id`, (req, res, next) => {
+      router.put(`/${endpoint}/:id`, (req) => {
         return withTransaction(() => {
           return crudService.update(req.params.id, req.body);
-        }, isTransactional)
-        .then(res.customRest)
-        .catch(next);
+        }, isTransactional);
       });
     });
 
     findAction(actions, 'delete', (isTransactional) => {
-      router.delete(`/${endpoint}/:id`, (req, res, next) => {
+      router.delete(`/${endpoint}/:id`, (req) => {
         return withTransaction(() => {
           return crudService.delete(req.params.id);
-        }, isTransactional)
-        .then(res.customRest)
-        .catch(next);
+        }, isTransactional);
       });
     });
   };
