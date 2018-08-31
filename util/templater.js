@@ -7,7 +7,7 @@ const httpMethods = http.METHODS ? http.METHODS.map((method) => {
 }) : [];
 
 // default status codes
-const defaultStatusCode = {
+const defaultStatusCodes = {
   get: 200,
   post: 201,
   put: 200,
@@ -24,7 +24,7 @@ const defaultTemplater = (req, res, body) => {
 module.exports = (config, router) => {
   const configTemplater = config.routerTemplate || {};
   const statusCode = {
-    ...defaultStatusCode,
+    ...defaultStatusCodes,
     ...(configTemplater.statusCodes || {}),
   };
   const templater = configTemplater.template || defaultTemplater;
