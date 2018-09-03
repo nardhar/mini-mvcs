@@ -258,6 +258,57 @@ describe('Unit Testing error handler', () => {
   });
 
   describe('Wrapping of multiple callbacks', () => {
-    // TODO
+    let templaterObject;
+
+    beforeEach(() => {
+      templaterObject = templater({}, routerMock);
+
+      templaterObject.get(
+        '/path',
+        (req, res, next) => {
+          res.passVariable = true;
+          next();
+        },
+        (req, res, next) => {
+          if (req.hasValue) {
+            res.passVariable2 = true;
+            next();
+          } else {
+            next('error');
+          }
+        },
+        (req, res) => {
+          return {
+            one: res.passVariable,
+            two: res.passVariable2,
+            result: true,
+          };
+        },
+      );
+    });
+
+    it('should keep passed variables through res and execute all callbacks if next()', (done) => {
+      routerMock.execute({ hasValue: true, originalUrl: '/path', method: 'get' }, resMock)
+      .then(() => {
+        // the status code of the response does not change
+        expect(result).to.have.property('code', 200);
+        expect(result).to.have.property('data');
+        expect(result.data).to.deep.equal({ one: true, two: true, result: true });
+        done();
+      })
+      .catch(done);
+    });
+
+    it('should keep skip a callback', (done) => {
+      routerMock.execute({ hasValue: false, originalUrl: '/path', method: 'get' }, resMock)
+      .then(() => {
+        // the status code of the response does not change
+        expect(result).to.have.property('code', 200);
+        expect(result).to.have.property('data');
+        expect(result.data).to.deep.equal({ one: true, two: true, result: true });
+        done();
+      })
+      .catch(done);
+    });
   });
 });
