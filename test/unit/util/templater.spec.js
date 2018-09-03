@@ -302,10 +302,8 @@ describe('Unit Testing error handler', () => {
     it('should keep skip a callback', (done) => {
       routerMock.execute({ hasValue: false, originalUrl: '/path', method: 'get' }, resMock)
       .then(() => {
-        // the status code of the response does not change
-        expect(result).to.have.property('code', 200);
-        expect(result).to.have.property('data');
-        expect(result.data).to.deep.equal({ one: true, two: true, result: true });
+        // result should not be modififed, i.e.: be kept as an empty object
+        expect(result).to.deep.equal({});
         done();
       })
       .catch(done);
