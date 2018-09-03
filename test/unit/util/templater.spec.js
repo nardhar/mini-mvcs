@@ -36,8 +36,7 @@ class Router {
         return Promise.resolve(callback(req, res, (...args) => {
           // if 'next()' is called with an argument (an error) then it doens't execute the rest of
           // the callbacks
-          if (args.length > 0) cont = false;
-          else cont = true;
+          if (args.length === 0) cont = true;
         }))
         .then(() => {
           return cont;
