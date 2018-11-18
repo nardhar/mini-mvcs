@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 
-const { NotFoundError, ValidationError, FieldError } = require('../../../errors');
+const { NotFoundError, ValidationError, FieldError } = require('../../../src/errors');
 
 describe('Unit Testing errors Api', () => {
   describe('NotFoundError', () => {

@@ -34,7 +34,7 @@ let modelLoader;
 describe('Unit Testing model Loader', () => {
   before(() => {
     rewiremock.enable();
-    modelLoader = require('../../../loaders/model');
+    modelLoader = require('../../../src/loaders/model');
   });
 
   after(() => { rewiremock.disable(); });

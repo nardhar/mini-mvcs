@@ -54,7 +54,7 @@ let resMock;
 describe('Unit Testing error handler', () => {
   before(() => {
     rewiremock.enable();
-    templater = require('../../../util/templater');
+    templater = require('../../../src/util/templater');
   });
 
   after(() => { rewiremock.disable(); });

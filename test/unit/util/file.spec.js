@@ -31,7 +31,7 @@ let fileUtil;
 describe('Unit Testing file Util module', () => {
   before(() => {
     rewiremock.enable();
-    fileUtil = require('../../../util/file');
+    fileUtil = require('../../../src/util/file');
   });
 
   after(() => { rewiremock.disable(); });

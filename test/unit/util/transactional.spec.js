@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 
-const transactional = require('../../../util/transactional');
+const transactional = require('../../../src/util/transactional');
 
 const withTransaction = transactional({
   // mocking sequelize transactionallity

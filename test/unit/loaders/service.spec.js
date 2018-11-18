@@ -30,7 +30,7 @@ rewiremock('../util/file').with({
   },
 });
 // mocking require of each service itself
-rewiremock('../test/resource/srcSample/services/book.service').with((services, models) => {
+rewiremock('../../test/resource/srcSample/services/book.service').with((services, models) => {
   return {
     save(params) {
       return models.Book.save(params);
@@ -40,7 +40,7 @@ rewiremock('../test/resource/srcSample/services/book.service').with((services, m
     },
   };
 });
-rewiremock('../test/resource/srcSample/services/author.service').with((services, models) => {
+rewiremock('../../test/resource/srcSample/services/author.service').with((services, models) => {
   return {
     save(params) {
       return models.Author.save(params);
@@ -66,7 +66,7 @@ let serviceLoader;
 describe('Unit Testing service Loader', () => {
   before(() => {
     rewiremock.enable();
-    serviceLoader = require('../../../loaders/service');
+    serviceLoader = require('../../../src/loaders/service');
   });
 
   after(() => { rewiremock.disable(); });
@@ -77,8 +77,8 @@ describe('Unit Testing service Loader', () => {
         {
           // since rewiremock only mocks existing modules we need to create the same file structure
           // for importing the dynamically called services with require, even though they will be
-          // mocked here. Note: appPath must be relative to loaders/service
-          appPath: '../test/resource/srcSample',
+          // mocked here. Note: appPath must be relative to src/loaders/service
+          appPath: '../../test/resource/srcSample',
         },
         modelsMock,
       );
@@ -92,7 +92,7 @@ describe('Unit Testing service Loader', () => {
     it('should load a service folder with a custom suffix', (done) => {
       const services = serviceLoader(
         {
-          appPath: '../test/resource/srcSample',
+          appPath: '../../test/resource/srcSample',
           service: {
             suffix: 'service', // without a .
           },
@@ -110,7 +110,7 @@ describe('Unit Testing service Loader', () => {
     it('should load a service folder with some files to ignore', (done) => {
       const services = serviceLoader(
         {
-          appPath: '../test/resource/srcSample',
+          appPath: '../../test/resource/srcSample',
           service: {
             ignore: ['ignore.service.js'],
           },
@@ -127,7 +127,7 @@ describe('Unit Testing service Loader', () => {
     it('should load a service folder different to the default one', (done) => {
       const services = serviceLoader(
         {
-          appPath: '../test/resource/srcSample',
+          appPath: '../../test/resource/srcSample',
           service: {
             dir: 'servicesIgnore',
             ignore: ['ignore.service.js'],
@@ -148,7 +148,7 @@ describe('Unit Testing service Loader', () => {
     it('should load services for execution', (done) => {
       const services = serviceLoader(
         {
-          appPath: '../test/resource/srcSample',
+          appPath: '../../test/resource/srcSample',
           service: {
             ignore: ['ignore.service.js'],
           },

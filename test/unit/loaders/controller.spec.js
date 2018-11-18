@@ -32,10 +32,10 @@ rewiremock('../util/file').with({
 
 let controllerLoader;
 
-describe('Unit Testing error handler', () => {
+describe('Unit Testing CRUD Controller', () => {
   before(() => {
     rewiremock.enable();
-    controllerLoader = require('../../../loaders/controller');
+    controllerLoader = require('../../../src/loaders/controller');
   });
 
   after(() => { rewiremock.disable(); });

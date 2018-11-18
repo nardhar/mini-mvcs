@@ -2,13 +2,13 @@ const path = require('path');
 
 const appFolder = path.dirname(module.parent.filename);
 
-const config = require('./loaders/config')(appFolder);
-const models = require('./loaders/model')(config);
-const withTransaction = require('./util/transactional')(models);
-const errors = require('./errors');
-const crudController = require('./crud/crud-controller')(withTransaction);
-const crudService = require('./crud/crud-service');
-const controllerLoader = require('./loaders/controller');
+const config = require('./src/loaders/config')(appFolder);
+const models = require('./src/loaders/model')(config);
+const withTransaction = require('./src/util/transactional')(models);
+const errors = require('./src/errors');
+const crudController = require('./src/crud/crud-controller')(withTransaction);
+const crudService = require('./src/crud/crud-service');
+const controllerLoader = require('./src/loaders/controller');
 
 const start = () => {
   // the controllers are loaded later so that mini-mvcs package is available in the

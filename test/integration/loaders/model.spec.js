@@ -1,10 +1,7 @@
 const path = require('path');
 const { expect } = require('chai');
-// const proxyQuire = require('proxyquire-2');
 
-// const modelLoader = proxyQuire('../../../loaders/model', { path });
-
-const modelLoader = require('../../../loaders/model');
+const modelLoader = require('../../../src/loaders/model');
 
 /**
  * Testing the models loader, the database params are not actually used, it is just for creating

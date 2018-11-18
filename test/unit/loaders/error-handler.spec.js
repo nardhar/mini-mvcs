@@ -74,7 +74,7 @@ let resMock;
 describe('Unit Testing error handler', () => {
   before(() => {
     rewiremock.enable();
-    errorHandler = require('../../../loaders/error-handler');
+    errorHandler = require('../../../src/loaders/error-handler');
   });
 
   beforeEach(() => {

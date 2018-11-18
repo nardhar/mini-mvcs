@@ -36,7 +36,7 @@ rewiremock('../util/file').with({
   },
 });
 // mocking require of each service itself
-rewiremock('../test/resource/srcSample/middlewares/auth.middleware').with((services) => {
+rewiremock('../../test/resource/srcSample/middlewares/auth.middleware').with((services) => {
   return {
     order: 10,
     callback: (req, res, next) => {
@@ -48,7 +48,7 @@ rewiremock('../test/resource/srcSample/middlewares/auth.middleware').with((servi
     },
   };
 });
-rewiremock('../test/resource/srcSample/middlewares/sample.middleware').with((services) => {
+rewiremock('../../test/resource/srcSample/middlewares/sample.middleware').with((services) => {
   return {
     order: 20,
     callback: (req, res, next) => {
@@ -60,7 +60,7 @@ rewiremock('../test/resource/srcSample/middlewares/sample.middleware').with((ser
     },
   };
 });
-rewiremock('../test/resource/srcSample/middlewares/ignore.middleware').with((services) => {
+rewiremock('../../test/resource/srcSample/middlewares/ignore.middleware').with((services) => {
   return {
     order: 25,
     callback: (req, res, next) => {
@@ -72,7 +72,7 @@ rewiremock('../test/resource/srcSample/middlewares/ignore.middleware').with((ser
     },
   };
 });
-rewiremock('../test/resource/srcSample/middlewares/with-path-1.middleware').with((services) => {
+rewiremock('../../test/resource/srcSample/middlewares/with-path-1.middleware').with((services) => {
   return {
     path: '/path1',
     order: 30,
@@ -85,7 +85,7 @@ rewiremock('../test/resource/srcSample/middlewares/with-path-1.middleware').with
     },
   };
 });
-rewiremock('../test/resource/srcSample/middlewares/same-path-1.middleware').with((services) => {
+rewiremock('../../test/resource/srcSample/middlewares/same-path-1.middleware').with((services) => {
   return {
     path: '/path1',
     order: 35,
@@ -98,7 +98,7 @@ rewiremock('../test/resource/srcSample/middlewares/same-path-1.middleware').with
     },
   };
 });
-rewiremock('../test/resource/srcSample/middlewares/other-path-1.middleware').with((services) => {
+rewiremock('../../test/resource/srcSample/middlewares/other-path-1.middleware').with((services) => {
   return {
     path: '/path1',
     order: 40,
@@ -111,7 +111,7 @@ rewiremock('../test/resource/srcSample/middlewares/other-path-1.middleware').wit
     },
   };
 });
-rewiremock('../test/resource/srcSample/middlewares/with-path-2.middleware').with((services) => {
+rewiremock('../../test/resource/srcSample/middlewares/with-path-2.middleware').with((services) => {
   return {
     path: '/path2',
     order: 45,
@@ -124,7 +124,7 @@ rewiremock('../test/resource/srcSample/middlewares/with-path-2.middleware').with
     },
   };
 });
-rewiremock('../test/resource/srcSample/middlewares/same-path-2.middleware').with((services) => {
+rewiremock('../../test/resource/srcSample/middlewares/same-path-2.middleware').with((services) => {
   return {
     path: '/path2',
     order: 50,
@@ -137,7 +137,7 @@ rewiremock('../test/resource/srcSample/middlewares/same-path-2.middleware').with
     },
   };
 });
-rewiremock('../test/resource/srcSample/middlewares/notamiddleware').with((services) => {
+rewiremock('../../test/resource/srcSample/middlewares/notamiddleware').with((services) => {
   return {
     path: '/path3',
     order: 55,
@@ -147,7 +147,7 @@ rewiremock('../test/resource/srcSample/middlewares/notamiddleware').with((servic
     },
   };
 });
-rewiremock('../test/resource/srcSample/middlewaresIgnore/auth.middleware').with(() => {
+rewiremock('../../test/resource/srcSample/middlewaresIgnore/auth.middleware').with(() => {
   return {
     order: 10,
     callback: (req, res, next) => {
@@ -155,7 +155,7 @@ rewiremock('../test/resource/srcSample/middlewaresIgnore/auth.middleware').with(
     },
   };
 });
-rewiremock('../test/resource/srcSample/middlewaresIgnore/sample.middleware').with(() => {
+rewiremock('../../test/resource/srcSample/middlewaresIgnore/sample.middleware').with(() => {
   return {
     order: 20,
     callback: (req, res, next) => {
@@ -177,7 +177,7 @@ let middlewareLoader;
 describe('Unit Testing middleware Loader', () => {
   before(() => {
     rewiremock.enable();
-    middlewareLoader = require('../../../loaders/middleware');
+    middlewareLoader = require('../../../src/loaders/middleware');
   });
 
   after(() => { rewiremock.disable(); });
@@ -188,8 +188,8 @@ describe('Unit Testing middleware Loader', () => {
         {
           // since rewiremock only mocks existing modules we need to create the same file structure
           // for importing the dynamically called services with require, even though they will be
-          // mocked here. Note: appPath must be relative to loaders/service
-          appPath: '../test/resource/srcSample',
+          // mocked here. Note: appPath must be relative to src/loaders/middleware
+          appPath: '../../test/resource/srcSample',
         },
         servicesMock,
       );
@@ -219,7 +219,7 @@ describe('Unit Testing middleware Loader', () => {
     it('should load a middleware folder with a custom suffix', (done) => {
       const middlewares = middlewareLoader(
         {
-          appPath: '../test/resource/srcSample',
+          appPath: '../../test/resource/srcSample',
           middleware: {
             suffix: 'middleware', // without a .
           },
@@ -256,7 +256,7 @@ describe('Unit Testing middleware Loader', () => {
     it('should load a middleware folder with some files to ignore', (done) => {
       const middlewares = middlewareLoader(
         {
-          appPath: '../test/resource/srcSample',
+          appPath: '../../test/resource/srcSample',
           middleware: {
             ignore: ['ignore.middleware.js'],
           },
@@ -288,7 +288,7 @@ describe('Unit Testing middleware Loader', () => {
     it('should load a middleware folder different to the default one', (done) => {
       const middlewares = middlewareLoader(
         {
-          appPath: '../test/resource/srcSample',
+          appPath: '../../test/resource/srcSample',
           middleware: {
             dir: 'middlewaresIgnore',
             ignore: [
@@ -325,7 +325,7 @@ describe('Unit Testing middleware Loader', () => {
       // loading the middlewares
       middlewareLoader(
         {
-          appPath: '../test/resource/srcSample',
+          appPath: '../../test/resource/srcSample',
           middleware: {
             ignore: ['ignore.middleware.js'],
           },

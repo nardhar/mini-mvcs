@@ -1,11 +1,7 @@
 const { expect } = require('chai');
 const path = require('path');
-// const proxyQuire = require('proxyquire-2');
-// const fs = require('fs');
 
-// const fileUtil = proxyQuire('../../../util/file', { fs, path });
-
-const fileUtil = require('../../../util/file');
+const fileUtil = require('../../../src/util/file');
 
 describe('Integration Testing file Util module', () => {
   describe('loaddirSync', () => {

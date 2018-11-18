@@ -2,7 +2,7 @@ const { expect } = require('chai');
 // NOTE: sequelize-mock is not working right, or at least it does not emulates a database state
 // maybe a custom sequelize mock should be created or convert all these tests into integration ones
 const SequelizeMock = require('sequelize-mock');
-const crudService = require('../../../crud/crud-service');
+const crudService = require('../../../src/crud/crud-service');
 
 const dbMock = new SequelizeMock();
 

@@ -1,10 +1,7 @@
 const path = require('path');
 const { expect } = require('chai');
-// const proxyQuire = require('proxyquire-2');
 
-// const controllerLoader = proxyQuire('../../../loaders/controller', { path });
-
-const controllerLoader = require('../../../loaders/controller');
+const controllerLoader = require('../../../src/loaders/controller');
 
 const extractRoutes = (app) => {
   // eslint-disable-next-line no-underscore-dangle

@@ -30,7 +30,7 @@ let config;
 describe('Unit Testing config Loader', () => {
   before(() => {
     rewiremock.enable();
-    config = require('../../../loaders/config');
+    config = require('../../../src/loaders/config');
   });
 
   after(() => { rewiremock.disable(); });
