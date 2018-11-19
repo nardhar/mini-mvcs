@@ -100,10 +100,10 @@ module.exports = (model) => {
   service.offsetLimit = (params) => {
     if (params && 'limit' in params && ('page' in params || 'offset' in params)) {
       return {
-        offset: 'offset' in params
-          ? params.offset
-          : (params.page - 1) * params.limit,
-        limit: params.limit,
+        // using Math.max so the offset can not be less than zero
+        offset: Math.max('offset' in params ? params.offset : (params.page - 1) * params.limit, 0),
+        // using Math.max so the limit is at least one
+        limit: Math.max(params.limit, 1),
       };
     }
     return {};

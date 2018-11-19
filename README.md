@@ -20,7 +20,7 @@ This has (IMHO) really good advantages:
 
 - The **Controller** layer is responsible only for receiving the request and show the result of the operation.
 - The **Model** layer is responsible for defining how is defined the data model.
-- The **Service** layer holds all the functionality that compounds the core of the application otherwise known as the Bussiness Layer, making it highly reusable for controllers and services themselves.
+- The **Service** layer holds all the functionality that compounds the core of the application otherwise known as the Business Layer, making it highly reusable for controllers and services themselves.
 - And last, it helps my code to be really functional, short and simple.
 
 Another consideration is to have the minimum dependencies required to run a common REST application and be as functional as it can (avoid async/await).
