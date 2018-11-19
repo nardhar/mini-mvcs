@@ -30,6 +30,22 @@ rewiremock('../util/file').with({
   },
 });
 
+const expressMock = () => {
+  return {
+    use(...args) {
+
+    },
+  };
+};
+expressMock.Router = () => {
+  return {
+    use(...args) {
+
+    },
+  };
+};
+rewiremock('express').with(expressMock);
+
 let controllerLoader;
 
 describe('Unit Testing CRUD Controller', () => {

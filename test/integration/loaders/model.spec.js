@@ -7,7 +7,7 @@ const modelLoader = require('../../../src/loaders/model');
  * Testing the models loader, the database params are not actually used, it is just for creating
  * the sequelize instance without syncing it
  */
-describe('Integration Testing model Loader', () => {
+describe('Integration Testing Model Loader', () => {
   describe('load a models folder', () => {
     const modelPath = path.resolve(__dirname, '../../resource/srcSample');
 
