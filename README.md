@@ -71,31 +71,42 @@ Following are all the configurable variables:
 |---|---|---|---|
 |database|Object||Sequelize variables for database configuration all other options can be added|
 |database.username|String|(none)|Database username|
-|database.password|String|(none)| Database user password
-|database.database|String|(none)| Database name
-|database.host|String|(none)|Database server host
-|database.port|Integer|(none)|Database server port
-|database.dialect|String|(none)|Database dialect
-|server|Object||Variables for the http server
-|server.port|Integer|4000|Http server port
-|api|Object||Variables for the Rest app
-|api.main|String|"/api/v1/"|Main route prefix
-|controller|Object||Controller configuration
-|controller.dir|String|"./controllers"|Controllers folder container, relative to index.js
-|controller.suffix|String|".controller"|Suffix for controller files
-|controller.ignore|Array<String>|[]|Files to ignore when importing the controllers
-|middleware|Object||Middleware configuration
-|middleware.dir|String|"./middlewares"|Middlewares folder container, relative to index.js
-|middleware.suffix|String|".middleware"|Suffix for middleware files
-|middleware.ignore|Array<String>|[]|Files to ignore when importing the middlewares
-|model|Object||Model configuration
-|model.dir|String|"./models"|Models folder container, relative to index.js
-|model.suffix|String|".model"|Suffix for model files
-|model.ignore|Array<String>|[]|Files to ignore when importing the models
-|service|Object||Service configuration
-|service.dir|String|"./services"|Services folder container, relative to index.js
-|service.suffix|String|".service"|Suffix for service files
-|service.ignore|Array<String>|[]|Files to ignore when importing the services
+|database.password|String|(none)|Database user password|
+|database.database|String|(none)|Database name|
+|database.host|String|(none)|Database server host|
+|database.port|Integer|(none)|Database server port|
+|database.dialect|String|(none)|Database dialect|
+|database.sync|Object|(none)|Variables for synchronizing the database schema|
+|database.sync.force|Boolean|false|If synchronizing should be done|
+|server|Object||Variables for the http server|
+|server.port|Integer|4000|Http server port|
+|api|Object||Variables for the Rest app|
+|api.main|String|"/api/v1/"|Main route prefix|
+|cors|Object|{<br/>&nbsp;&nbsp;origin: '*',<br/>&nbsp;&nbsp;methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',<br/>&nbsp;&nbsp;preflightContinue: true, <br/>&nbsp;&nbsp;headers: 'Cache-Control, Pragma, Content-Type, Authorization, Content-Length, X-Requested-With',<br/>&nbsp;&nbsp;'Access-Control-Allow-Headers': 'Authorization, Content-Type',<br/>}|Configuration for CORS|
+|globalMiddleware|Array|[<br/>&nbsp;&nbsp;bodyParser.json(),<br/>&nbsp;&nbsp;bodyParser.urlencoded({ extended: false }),<br/>  ]|Global middlewares to be used in all routes|
+|error|Object||Variables for configuring the error handling|
+|error.logger|Function|console.error|Function for logging the errors|
+|error.codes|Object|{<br/>&nbsp;&nbsp;ValidationError: 412,<br/>&nbsp;&nbsp;NotFoundError: 404,<br/>&nbsp;&nbsp;default: 400,<br/>&nbsp;&nbsp;internal: 500,<br/>}|Codes for the error classes that extend ApiError, the default one is for the ApiError itself, codes that are not overwriten will be merged|
+|error.renderer|Function|(err) => {<br/>&nbsp;&nbsp;return {<br/>&nbsp;&nbsp;&nbsp;&nbsp;message: err.message, <br/>&nbsp;&nbsp;&nbsp;&nbsp;errors: err.getBody(),<br/>&nbsp;&nbsp;};<br/>}|Function for rendering an ApiError|
+|routerTemplate|Object||Variables for configuring the default templater|
+|routerTemplate.statusCodes|Object|{<br/>&nbsp;&nbsp;get: 200,<br/>&nbsp;&nbsp;post: 201,<br/>&nbsp;&nbsp;put: 200,<br/>&nbsp;&nbsp;patch: 200,<br/>&nbsp;&nbsp;delete: 204,<br/>&nbsp;&nbsp;default: 200,<br/>}|Status codes for the successful responses, codes that are not overwriten will be merged|
+|routerTemplate.template|Function|(req, res, body) => {<br/>&nbsp;&nbsp;return body;<br/>}|Function for formatting the response, the original request and response are sent for special error handling|
+|controller|Object||Controller configuration|
+|controller.dir|String|"./controllers"|Controllers folder container, relative to index.js|
+|controller.suffix|String|".controller"|Suffix for controller files|
+|controller.ignore|Array<String>|[]|Files to ignore when importing the controllers|
+|middleware|Object||Middleware configuration|
+|middleware.dir|String|"./middlewares"|Middlewares folder container, relative to index.js|
+|middleware.suffix|String|".middleware"|Suffix for middleware files|
+|middleware.ignore|Array<String>|[]|Files to ignore when importing the middlewares|
+|model|Object||Model configuration|
+|model.dir|String|"./models"|Models folder container, relative to index.js|
+|model.suffix|String|".model"|Suffix for model files|
+|model.ignore|Array<String>|[]|Files to ignore when importing the models|
+|service|Object||Service configuration|
+|service.dir|String|"./services"|Services folder container, relative to index.js|
+|service.suffix|String|".service"|Suffix for service files|
+|service.ignore|Array<String>|[]|Files to ignore when importing the services|
 
 And of course you can add more variables of your own.
 
@@ -409,6 +420,32 @@ By default, CrudService throws a NotFoundError when something is not found and i
 ## Examples
 
 The examples of working apps with MiniMVCS are here: https://github.com/nardhar/mini-mvcs-examples
+
+## Tutorial
+
+For creating an app from scracth you can follow these steps:
+
+1. Create your typical node app
+
+  asdf
+
+2. Import MiniMVCS
+
+  asdfasd
+
+3. Create a config file
+
+ asdfasdf
+
+4. Create the database schema
+
+5. Create some models
+
+6. Create some (crud) services
+
+7. Create some (crud) controllers
+
+8. Start the app
 
 ## FAQ
 
