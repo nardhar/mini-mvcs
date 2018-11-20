@@ -25,7 +25,10 @@ module.exports = (config, models) => {
     bodyParser.json(),
     bodyParser.urlencoded({ extended: false }),
   ])
-  .forEach(app.use);
+  // .forEach(app.use) throws a TypeError: Cannot read property 'lazyrouter' of undefined
+  .forEach((middleware) => {
+    app.use(middleware);
+  });
 
   // loading the services since we well pass them to the middlewares and the controllers
   const services = serviceLoader(config, models);
