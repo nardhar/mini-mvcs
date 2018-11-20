@@ -34,7 +34,7 @@ Another consideration is to have the minimum dependencies required to run a comm
 
 If you think that your app does not need such complexity or maybe it would overload your application, then this mini-framework is not for you, but maybe you can get some good idea from here.
 
-## Installation
+## Installation and Configuration
 
 This library was built using Node v8.12.1, not the last LTS version now, but it works fine with node v10
 
@@ -42,9 +42,7 @@ This library was built using Node v8.12.1, not the last LTS version now, but it 
 $ npm install -S mini-mvcs
 ```
 
-## Configuration
-
-Create a ```config.js``` file following this structure:
+For configuring the app create a ```config.js``` file following this structure:
 
 ```javascript
 module.exports = {
@@ -99,7 +97,7 @@ Following are all the configurable variables:
 |service.suffix|String|".service"|Suffix for service files
 |service.ignore|Array<String>|[]|Files to ignore when importing the services
 
-And of course you can add more variables of your own (more on that later).
+And of course you can add more variables of your own.
 
 In the same folder create a file and import the library for starting an app:
 
@@ -185,7 +183,7 @@ module.exports = (services, models) => {
 };
 ```
 
-### CRUD Service
+## CRUD Service
 
 Guess what? creating service after service made me realize I was not being DRYish (again) so I created a CRUD Service utility to keep my files at minimum:
 
@@ -223,7 +221,7 @@ module.exports = (router, services) => {
 
 They should always end with ```.controller.js``` (unless configured otherwise).
 
-### Transactional controllers
+## Transactional controllers
 
 In order to create a transactional controller you can wrap your service calls with ```miniMvcs.withTransaction``` method like this:
 
@@ -244,7 +242,7 @@ module.exports = (router, services) => {
 };
 ```
 
-### CRUD controller
+## CRUD controller
 
 And again I found that all the functionality in the majority of the controllers could be reused, so I created a CRUD Controller (that depends on the structure proposed in CRUD Service) in order to minimize my code:
 
@@ -283,7 +281,7 @@ module.exports = (router, services) => {
 };
 ```
 
-### Templater
+## Templater
 
 Well, here I wanted to include my first library I created when learning NodeJS (https://github.com/nardhar/custom-rest-templater), but later I realized I could do better, so I wrote an express router wrapper, it has the same methods but it always executes an object wrapper upon the returned value from a controller, like this:
 
@@ -309,7 +307,7 @@ and with a configured template would respond like this:
 }
 ```
 
-### Creating Middlewares
+## Creating Middlewares
 
 In case you want to add some global middlewares, you can create a ```middlewares``` folder and create your middlewares files like this:
 
@@ -407,8 +405,6 @@ module.exports = (services, models) => {
 ```
 
 By default, CrudService throws a NotFoundError when something is not found and is catched by the error handling middleware
-
-### Error handling middleware
 
 ## Examples
 
