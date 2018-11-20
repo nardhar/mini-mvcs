@@ -6,9 +6,16 @@ A small Model View Controller Service Framework for creating Rest Apps with Node
 
 This mini-framework idea (I think it's neither big nor great enough to be called a full framework) came to my mind when I started doing my third or fourth backend project in NodeJS and copied my utilities, dir structure and code architecture; it was not that great but I was not being DRYish, so I refined my ideas and started working in this library.
 
-### Considerations
+## Architecture
 
-This library follows the good practices about architecture I learned when I was programming with [Grails](https://grails.org) Framework (I still do it) which highly encourages that applications should have a **Service** layer which in turn is the only one available to access the **Model** layer, basically this:
+This framework was built following concepts like:
+
+* MVC pattern
+* MVC + Service Layer
+* Functional programming
+* Asynchronous programming
+
+The architecture is basically this:
 
 ```
 ┌──────┐      ┌────────────┐      ┌─────────┐      ┌───────┐
@@ -23,21 +30,19 @@ This has (IMHO) really good advantages:
 - The **Service** layer holds all the functionality that compounds the core of the application otherwise known as the Business Layer, making it highly reusable for controllers and services themselves.
 - And last, it helps my code to be really functional, short and simple.
 
-Another consideration is to have the minimum dependencies required to run a common REST application and be as functional as it can (avoid async/await).
+Another consideration is to have the minimum dependencies required to run a common REST application and be as functional as it can (so I avoid async/await, but it can work with them).
 
-If you think that your app does not need such complexity or maybe it would overload your application, then this mini-framework is not for you.
+If you think that your app does not need such complexity or maybe it would overload your application, then this mini-framework is not for you, but maybe you can get some good idea from here.
 
-## Installation
+## Installation and Configuration
 
-This library was built using Node v8.11.1, the last LTS version at the time
+This library was built using Node v8.12.1, not the last LTS version now, but it works fine with node v10
 
 ```bash
 $ npm install -S mini-mvcs
 ```
 
-## Usage
-
-Create a ```config.js``` file following this structure:
+For configuring the app create a ```config.js``` file following this structure:
 
 ```javascript
 module.exports = {
@@ -60,52 +65,54 @@ module.exports = {
 };
 ```
 
-In the same folder create an ```index.js``` file and import the library for starting an app:
+Following are all the configurable variables:
+
+|Variable|Type|Default Value|Description|
+|---|---|---|---|
+|database|Object||Sequelize variables for database configuration all other options can be added|
+|database.username|String|(none)|Database username|
+|database.password|String|(none)| Database user password
+|database.database|String|(none)| Database name
+|database.host|String|(none)|Database server host
+|database.port|Integer|(none)|Database server port
+|database.dialect|String|(none)|Database dialect
+|server|Object||Variables for the http server
+|server.port|Integer|4000|Http server port
+|api|Object||Variables for the Rest app
+|api.main|String|"/api/v1/"|Main route prefix
+|controller|Object||Controller configuration
+|controller.dir|String|"./controllers"|Controllers folder container, relative to index.js
+|controller.suffix|String|".controller"|Suffix for controller files
+|controller.ignore|Array<String>|[]|Files to ignore when importing the controllers
+|middleware|Object||Middleware configuration
+|middleware.dir|String|"./middlewares"|Middlewares folder container, relative to index.js
+|middleware.suffix|String|".middleware"|Suffix for middleware files
+|middleware.ignore|Array<String>|[]|Files to ignore when importing the middlewares
+|model|Object||Model configuration
+|model.dir|String|"./models"|Models folder container, relative to index.js
+|model.suffix|String|".model"|Suffix for model files
+|model.ignore|Array<String>|[]|Files to ignore when importing the models
+|service|Object||Service configuration
+|service.dir|String|"./services"|Services folder container, relative to index.js
+|service.suffix|String|".service"|Suffix for service files
+|service.ignore|Array<String>|[]|Files to ignore when importing the services
+
+And of course you can add more variables of your own.
+
+In the same folder create a file and import the library for starting an app:
 
 ```javascript
-const miniMvcs = require('miniMvcs');
+const miniMvcs = require('mini-mvcs');
 miniMvcs.start();
 ```
 
-### Configuration
+If your app is going to be just a rest-app, then you could put this code on the ```index.js``` file of your project and simply run it with:
 
-Following are all the configurable variables:
-
-* ```database``` (Object) Sequelize variables for database configuration (all other options can be added)
-* ```database.username``` (String) Database username
-* ```database.password``` (String) Database user password
-* ```database.database``` (String) Database name
-* ```database.host``` (String) Database server host
-* ```database.port``` (Integer) Database server port
-* ```database.dialect``` (String) Database dialect
-* ```server``` (Object) Variables for the http server
-* ```server.port``` (Integer) (Default=4000) Http server port
-* ```api``` (Object) Variables for the Rest app
-* ```api.main``` (String) (Default="/api/v1/") Main route prefix
-* ```controller``` (Object) Controller configuration
-* ```controller.dir``` (String) (Default="./controllers") Controllers folder container, relative to index.js
-* ```controller.suffix``` (String) (Default=".controller") Suffix for controller files
-* ```controller.ignore``` (Array<String>) (Default=[]) Files to ignore when importing the controllers
-* ```middleware``` (Object) Middleware configuration
-* ```middleware.dir``` (String) (Default="./middlewares") Middlewares folder container, relative to index.js
-* ```middleware.suffix``` (String) (Default=".middleware") Suffix for middleware files
-* ```middleware.ignore``` (Array<String>) (Default=[]) Files to ignore when importing the middlewares
-* ```model``` (Object) Model configuration
-* ```model.dir``` (String) (Default="./models") Models folder container, relative to index.js
-* ```model.suffix``` (String) (Default=".model") Suffix for model files
-* ```model.ignore``` (Array<String>) (Default=[]) Files to ignore when importing the models
-* ```service``` (Object) Service configuration
-* ```service.dir``` (String) (Default="./services") Services folder container, relative to index.js
-* ```service.suffix``` (String) (Default=".service") Suffix for service files
-* ```service.ignore``` (Array<String>) (Default=[]) Files to ignore when importing the services
-
-And of course you can add some of your own and import them like this:
-
-```javascript
-const { config } = require('miniMvcs');
+```bash
+$ node index.js
 ```
 
-### Creating Models
+## Models
 
 Create a ```models``` folder and create your sequelize model files as usual, e.g.:
 
@@ -131,7 +138,7 @@ module.exports = (sequelize, DataTypes) => {
 };
 ```
 
-### Creating Services
+## Services
 
 Create a ```services``` folder and create a your services file like this:
 
@@ -176,7 +183,7 @@ module.exports = (services, models) => {
 };
 ```
 
-#### CRUD Service
+## CRUD Service
 
 Guess what? creating service after service made me realize I was not being DRYish (again) so I created a CRUD Service utility to keep my files at minimum:
 
@@ -195,7 +202,7 @@ module.exports = (services, models) => {
 
 This will create a service like the first block of service code in this section
 
-### Creating Controllers
+## Controllers
 
 Create a ```controllers``` folder and create a your controllers file like this:
 
@@ -214,7 +221,7 @@ module.exports = (router, services) => {
 
 They should always end with ```.controller.js``` (unless configured otherwise).
 
-#### Transactional controllers
+## Transactional controllers
 
 In order to create a transactional controller you can wrap your service calls with ```miniMvcs.withTransaction``` method like this:
 
@@ -235,7 +242,7 @@ module.exports = (router, services) => {
 };
 ```
 
-#### CRUD controller
+## CRUD controller
 
 And again I found that all the functionality in the majority of the controllers could be reused, so I created a CRUD Controller (that depends on the structure proposed in CRUD Service) in order to minimize my code:
 
@@ -274,28 +281,39 @@ module.exports = (router, services) => {
 };
 ```
 
-#### Templater
+## Templater
 
-Well, here I decided to include my first library I created when learning NodeJS (https://github.com/nardhar/custom-rest-templater), but at source code level, that is until I can make it fully pluggable. So I can end all my controllers with the ```res.customRest``` method:
+Well, here I wanted to include my first library I created when learning NodeJS (https://github.com/nardhar/custom-rest-templater), but later I realized I could do better, so I wrote an express router wrapper, it has the same methods but it always executes an object wrapper upon the returned value from a controller, like this:
 
 ```javascript
 // controllers/blog.controller.js
 module.exports = (router, services) => {
-  router.get('/my_blog/:code', (req, res, next) => {
+  router.get('/my_blog/:code', (req) => {
     return services.blog.readByCode(req.params.code)
-    .then(res.customRest)
-    .catch(next);
+    .then((blog) => {
+      return { blog };
+    });
   });
 };
 ```
 
-### Creating Middlewares
+and with a configured template would respond like this:
+```json
+{
+  "success": true,
+  "data": {
+    "blog": { "code": "A1B2", "title": "MiniMVCS Blog Post" }
+  }
+}
+```
 
-In case you want to add some middlewares, you can create a ```middlewares``` folder and create your middlewares files like this:
+## Creating Middlewares
+
+In case you want to add some global middlewares, you can create a ```middlewares``` folder and create your middlewares files like this:
 
 ```javascript
 // middlewares/auth.middleware.js
-// we can use the services
+// NOTE: we can use the services
 module.exports = (services) => {
   return {
     // the order property helps to add the middlewares in a specific order
@@ -313,11 +331,21 @@ module.exports = (services) => {
 
 They should always (unless configured otherwise) end with ```.middleware.js```.
 
-### Error Handling
+## Error Handling
 
-For generating DRYish errors I added some Error Classes (there are more samples in the sample/errors folder):
+Since this library uses Promises at all levels, you can just throw an ApiError() in the controllers, middlewares or services:
 
-#### ValidationError
+```javascript
+const { ApiError } = require('mini-mvcs');
+
+throw new ApiError(...);
+```
+
+and an error response will be sent.
+
+And of course you can create some custom error classes that extend ```ApiError``` to be handled properly, here are a couple Error Classes that are used in CrudService:
+
+### ValidationError
 
 For throwing errors when some data should not proceed
 
@@ -347,7 +375,7 @@ module.exports = (services, models) => {
 
 By default, CrudService throws a ValidationError when something can not be saved (even from sequelize) and is catched by the error handling middleware
 
-#### NotFoundError
+### NotFoundError
 
 For throwing errors when some data is not found
 
@@ -378,13 +406,9 @@ module.exports = (services, models) => {
 
 By default, CrudService throws a NotFoundError when something is not found and is catched by the error handling middleware
 
-### Running the App
+## Examples
 
-For running the app, just execute your ```index.js``` file as usual:
-
-```bash
-$ node index.js
-```
+The examples of working apps with MiniMVCS are here: https://github.com/nardhar/mini-mvcs-examples
 
 ## FAQ
 
@@ -405,6 +429,9 @@ Although it is a somewhat MVC framework, my only intention is to work for creati
 ## TODO
 
 Obviously there is a lot of work to do to improve this library, starting with (and in no particular order):
+- Finish the integration tests.
+- Improve the documentation (api doc?).
+- Make more examples.
 - Give it a better name.
 - Create a cli command for generating an app, models, controllers, services.
 - Make Sequelize and Express optional.
@@ -412,4 +439,3 @@ Obviously there is a lot of work to do to improve this library, starting with (a
 - Make it pluggable at all possible levels, although my intention is not for this to become a super library, but instead, to be a mini-framework for creating dry, simple and extensible REST apps.
 - Make CrudController and CrudService a plugin (or at least put them in another library).
 - Improve the Error API (Is it ok to be a class?) and make it pluggable.
-- Improve the REST templater (A wrapper may be a better idea) and make it pluggable.
