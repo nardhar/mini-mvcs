@@ -294,7 +294,7 @@ module.exports = (router, services) => {
 
 ## Templater
 
-Well, here I wanted to include my first library I created when learning NodeJS (https://github.com/nardhar/custom-rest-templater), but later I realized I could do better, so I wrote an express router wrapper, it has the same methods but it always executes an object wrapper upon the returned value from a controller, like this:
+In case your controllers responds with the same format in the majority of your app, you could use a **templater**, in fact I wanted to include my first library I created when learning NodeJS (https://github.com/nardhar/custom-rest-templater), but later I realized I could do better, so I wrote an express router wrapper, it has the same methods but it always executes an object wrapper upon the returned value from a controller, like this:
 
 ```javascript
 // controllers/blog.controller.js
@@ -316,6 +316,38 @@ and with a configured template would respond like this:
     "blog": { "code": "A1B2", "title": "MiniMVCS Blog Post" }
   }
 }
+```
+
+But since nothing is truly free (as in free beer), this templater comes with a "small" drawback:
+
+**Every controller function must return a resolvable Promise**
+
+So this piece of code would not render a response:
+
+```javascript
+// controllers/wrong-blog.controller.js
+module.exports = (router, services) => {
+  router.post('/my_blog', (req) => {
+    // ERROR: the blog would be saved, but the router would not have the blog saved data
+    services.blog.save(req.body);
+  });
+};
+```
+
+Obviously this could be fixed with a simple ```return```, but if we have a callback, we should wrap it in a promise, e.g.:
+
+```javascript
+// controllers/wrong-blog.controller.js
+module.exports = (router, services) => {
+  router.post('/my_blog', (req) => {
+    return new Promise((resolve, reject) => {
+      services.blog.callbackMethod(req.body, (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
+      });
+    });
+  });
+};
 ```
 
 ## Creating Middlewares
