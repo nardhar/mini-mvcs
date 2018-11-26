@@ -13,6 +13,8 @@ const appLoader = require('./src/loaders/app');
 const start = () => {
   // the app is loaded later so that mini-mvcs package is available in the
   // controllers and services that inherit from crudController and crudService
+  // but making the services impossible to be imported in an additional custom
+  // layer of the app (this should be prompted later)
   const app = appLoader(config, models);
 
   // starts the app after syncing the database

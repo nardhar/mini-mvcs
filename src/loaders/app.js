@@ -30,7 +30,7 @@ module.exports = (config, models) => {
     app.use(middleware);
   });
 
-  // loading the services since we well pass them to the middlewares and the controllers
+  // loading the services since we will pass them to the middlewares and the controllers
   const services = serviceLoader(config, models);
 
   // creates the express router
@@ -42,7 +42,7 @@ module.exports = (config, models) => {
   });
 
   // imports the templater
-  const templateRouter = templater(config, router);
+  const templateRouter = 'routerTemplate' in config ? templater(config, router) : router;
 
   // it loads the controllers
   controllerLoader(config, templateRouter, services);
