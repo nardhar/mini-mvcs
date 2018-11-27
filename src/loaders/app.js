@@ -42,7 +42,9 @@ module.exports = (config, models) => {
   });
 
   // imports the templater
-  const templateRouter = 'routerTemplate' in config ? templater(config, router) : router;
+  const templateRouter = 'routerTemplate' in config && config.routerTemplate === false
+    ? router
+    : templater(config, router);
 
   // it loads the controllers
   controllerLoader(config, templateRouter, services);
