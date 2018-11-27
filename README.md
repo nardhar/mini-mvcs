@@ -15,16 +15,17 @@ This framework was built following concepts like:
 * Functional programming
 * Asynchronous programming
 
-The architecture is basically this:
+And its architecture is basically this:
 
 ```
-┌──────┐      ┌────────────┐      ┌─────────┐      ┌───────┐
-│ View │ ───> │ Controller │ ───> │ Service │ ───> │ Model │
-└──────┘      └────────────┘      └─────────┘      └───────┘
+              ┌────────────┐      ┌────────────┐      ┌─────────┐      ┌───────┐
+ Request ───> │ Middleware │ ───> │ Controller │ ───> │ Service │ ───> │ Model │
+              └────────────┘      └────────────┘      └─────────┘      └───────┘
 ```
 
 This has (IMHO) really good advantages:
 
+- The **Middleware** layer is responsible only for modifying or managing a group of controller actions.
 - The **Controller** layer is responsible only for receiving the request and show the result of the operation.
 - The **Model** layer is responsible for defining how is defined the data model.
 - The **Service** layer holds all the functionality that compounds the core of the application otherwise known as the Business Layer, making it highly reusable for controllers and services themselves.
@@ -32,11 +33,11 @@ This has (IMHO) really good advantages:
 
 Another consideration is to have the minimum dependencies required to run a common REST application and be as functional as it can (so I avoid async/await, but it can work with them).
 
-If you think that your app does not need such complexity or maybe it would overload your application, then this mini-framework is not for you, but maybe you can get some good idea from here.
+If you think that your app does not need such complexity or maybe it would overload your application, then this mini-framework is not for you, but maybe you can get some good ideas from here.
 
 ## Installation and Configuration
 
-This library was built using Node v8.12.1, not the last LTS version now, but it works fine with node v10
+This library was built using Node v8.12.0, not the last LTS version now, but it works fine with node v10
 
 ```bash
 $ npm install -S mini-mvcs
@@ -88,7 +89,7 @@ Following are all the configurable variables:
 |error.logger|Function|console.error|Function for logging the errors|
 |error.codes|Object|{<br/>&nbsp;&nbsp;ValidationError: 412,<br/>&nbsp;&nbsp;NotFoundError: 404,<br/>&nbsp;&nbsp;default: 400,<br/>&nbsp;&nbsp;internal: 500,<br/>}|Codes for the error classes that extend ApiError, the default one is for the ApiError itself, codes that are not overwriten will be merged|
 |error.renderer|Function|(err) => {<br/>&nbsp;&nbsp;return {<br/>&nbsp;&nbsp;&nbsp;&nbsp;message: err.message, <br/>&nbsp;&nbsp;&nbsp;&nbsp;errors: err.getBody(),<br/>&nbsp;&nbsp;};<br/>}|Function for rendering an ApiError|
-|routerTemplate|Object||Variables for configuring the default templater|
+|routerTemplate|Object / Boolean||Variables for configuring the default templater, if false it will not use the router templater wrapper|
 |routerTemplate.statusCodes|Object|{<br/>&nbsp;&nbsp;get: 200,<br/>&nbsp;&nbsp;post: 201,<br/>&nbsp;&nbsp;put: 200,<br/>&nbsp;&nbsp;patch: 200,<br/>&nbsp;&nbsp;delete: 204,<br/>&nbsp;&nbsp;default: 200,<br/>}|Status codes for the successful responses, codes that are not overwriten will be merged|
 |routerTemplate.template|Function|(req, res, body) => {<br/>&nbsp;&nbsp;return body;<br/>}|Function for formatting the response, the original request and response are sent for special error handling|
 |controller|Object||Controller configuration|
@@ -359,8 +360,10 @@ In case you want to add some global middlewares, you can create a ```middlewares
 // NOTE: we can use the services
 module.exports = (services) => {
   return {
+    path: '*',
     // the order property helps to add the middlewares in a specific order
     order: 10,
+    // the actual middleware
     callback: (req, res, next) => {
       return services.blog.read(req.headers.authorization).then((blog) => {
         res.locals.blogId = blog.id;
@@ -374,12 +377,15 @@ module.exports = (services) => {
 
 They should always (unless configured otherwise) end with ```.middleware.js```.
 
+NOTE: I know they look kind of weird, but I can't figure out a way to write them better without making them more complicated
+
 ## Error Handling
 
 Since this library uses Promises at all levels, you can just throw an ApiError() in the controllers, middlewares or services:
 
 ```javascript
-const { ApiError } = require('mini-mvcs');
+const { errors } = require('mini-mvcs');
+const { ApiError } = errors;
 
 throw new ApiError(...);
 ```
@@ -398,7 +404,8 @@ Create a ValidationError instance and throw it:
 
 ```javascript
 // services/blog.service.js
-const { ValidationError, FieldError } = require('mini-mvcs');
+const { errors } = require('mini-mvcs');
+const { ValidationError, FieldError } = errors;
 
 module.exports = (services, models) => {
   // ...
@@ -428,7 +435,8 @@ Create a NotFoundError instance and throw it:
 
 ```javascript
 // services/blog.service.js
-const { NotFoundError } = require('mini-mvcs');
+const { errors } = require('mini-mvcs');
+const { NotFoundError } = errors;
 
 module.exports = (services, models) => {
   // ...
@@ -449,35 +457,258 @@ module.exports = (services, models) => {
 
 By default, CrudService throws a NotFoundError when something is not found and is catched by the error handling middleware
 
-## Examples
+## Quickstart
 
-The examples of working apps with MiniMVCS are here: https://github.com/nardhar/mini-mvcs-examples
-
-## Tutorial
-
-For creating an app from scracth you can follow these steps:
+For creating an app from scratch you can follow these steps:
 
 1. Create your typical node app
 
-  asdf
+```bash
+$ mkdir mini-mvcs-quickstart
+$ cd mini-mvcs-quickstart
+$ npm init -y
+```
 
-2. Import MiniMVCS
+2. Install MiniMVCS
 
-  asdfasd
+// from now on, every bash command will assume we are on the ```mini-mvcs-quickstart``` folder
 
-3. Create a config file
+```bash
+$ npm install --save mini-mvcs
+```
 
- asdfasdf
+3. Create an index and a config file
+
+```bash
+$ touch index.js
+$ touch config.js
+```
+
+```javascript
+// index.js
+const miniMvcs = require('mini-mvcs');
+
+miniMvcs.start();
+```
+
+```javascript
+// config.js
+module.exports = {
+  development: {
+    database: {
+      username: "postgres",
+      password: "postgres",
+      database: "mini-mvcs-quickstart",
+      host: "127.0.0.1",
+      port: 5432,
+      dialect: "postgres",
+      logging: false,
+      pool: {
+        max: 15,
+        min: 0,
+        idle: 10000
+      },
+      sync: { force: process.env.FORCE || false },
+      define: {
+        underscored: true,
+        freezeTableName: true,
+      },
+    },
+    server: {
+      port: 4000,
+    },
+    api: {
+      main: '/api/v1/',
+    },
+    controller: {},
+    middleware: {},
+    model: {},
+    service: {},
+  },
+  test: {
+    dialect: "sqlite",
+    storage: ":memory:"
+  },
+  production: {
+    database: {
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      host: process.env.DB_HOSTNAME,
+      dialect: 'mysql',
+    },
+  }
+};
+```
 
 4. Create the database schema
 
+Execute this sql command in your postgres sql console
+
+```sql
+CREATE TABLE public.blog
+(
+  id integer NOT NULL DEFAULT nextval('blog_id_seq'::regclass),
+  author character varying(255),
+  name character varying(255),
+  description character varying(255),
+  created_at timestamp with time zone NOT NULL,
+  updated_at timestamp with time zone NOT NULL,
+  CONSTRAINT blog_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE public.post
+(
+  id integer NOT NULL DEFAULT nextval('post_id_seq'::regclass),
+  title character varying(255),
+  content text,
+  created_at timestamp with time zone NOT NULL,
+  updated_at timestamp with time zone NOT NULL,
+  fid_blog integer NOT NULL,
+  CONSTRAINT post_pkey PRIMARY KEY (id),
+  CONSTRAINT post_fid_blog_fkey FOREIGN KEY (fid_blog)
+      REFERENCES public.blog (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE NO ACTION
+);
+```
+
 5. Create some models
+
+```bash
+$ mkdir models
+$ cd models
+$ touch blog.js
+$ touch post.js
+```
+
+```javascript
+// blog.js
+module.exports = (sequelize, DataTypes) => {
+  const Blog = sequelize.define('Blog', {
+    author: DataTypes.STRING(255),
+    name: DataTypes.STRING(255),
+    description: DataTypes.STRING(255),
+  }, {
+    tableName: 'blog',
+  });
+
+  Blog.associate = (models) => {
+    models.Blog.hasMany(models.Post, {
+      as: 'posts',
+      foreignKey: 'fid_blog',
+    });
+  };
+
+  return Blog;
+};
+```
+
+```javascript
+// post.js
+module.exports = (sequelize, DataTypes) => {
+  const Post = sequelize.define('Post', {
+    title: DataTypes.STRING(255),
+    content: DataTypes.TEXT,
+  }, {
+    tableName: 'post',
+  });
+
+  Post.associate = (models) => {
+    models.Post.belongsTo(models.Blog, {
+      as: 'blog',
+      foreignKey: {
+        name: 'idBlog',
+        field: 'fid_blog',
+        allowNull: false,
+      },
+    });
+  };
+
+  return Post;
+};
+```
 
 6. Create some (crud) services
 
+```bash
+$ mkdir services
+$ cd services
+$ touch blog.service.js
+$ touch post.service.js
+```
+
+```javascript
+// services/blog.service.js
+const { crudService } = require('mini-mvcs');
+
+module.exports = (services, models) => {
+  const blogService = crudService(models.Blog);
+
+  return blogService;
+};
+```
+
+```javascript
+// services/post.service.js
+const { crudService } = require('mini-mvcs');
+
+module.exports = (services, models) => {
+  const postService = crudService(models.Post);
+
+  return postService;
+};
+```
+
 7. Create some (crud) controllers
 
+```bash
+$ mkdir controllers
+$ cd controllers
+$ touch blog.controller.js
+$ touch post.controller.js
+```
+
+```javascript
+// controllers/blog.controller.js
+const { crudController } = require('mini-mvcs');
+
+module.exports = (router, services) => {
+  crudController('blog', router, services.blog);
+};
+```
+
+```javascript
+// controllers/post.controller.js
+const { crudController } = require('mini-mvcs');
+
+module.exports = (router, services) => {
+  crudController('post', router, services.post);
+};
+```
+
 8. Start the app
+
+First we add an start script in package.json
+
+```json
+// package.json
+...
+"scripts": {
+  "start": "node ./index",
+  "test": "echo \"Error: no test specified\" && exit 1"
+},
+...
+```
+
+And we start the app
+
+```bash
+$ npm start
+```
+
+## Examples
+
+The examples of working apps with MiniMVCS will be here: https://github.com/nardhar/mini-mvcs-examples
 
 ## FAQ
 
@@ -499,7 +730,7 @@ Although it is a somewhat MVC framework, my only intention is to work for creati
 
 Obviously there is a lot of work to do to improve this library, starting with (and in no particular order):
 - Finish the integration tests.
-- Improve the documentation (api doc?).
+- Improve the documentation.
 - Make more examples.
 - Give it a better name.
 - Create a cli command for generating an app, models, controllers, services.
