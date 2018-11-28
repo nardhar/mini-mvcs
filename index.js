@@ -2,18 +2,20 @@ const path = require('path');
 
 const appFolder = path.dirname(module.parent.filename);
 
-const config = require('./loaders/config')(appFolder);
-const models = require('./loaders/model')(config);
-const withTransaction = require('./util/transactional')(models);
-const errors = require('./errors');
-const crudController = require('./crud/crud-controller')(withTransaction);
-const crudService = require('./crud/crud-service');
-const controllerLoader = require('./loaders/controller');
+const config = require('./src/loaders/config')(appFolder);
+const models = require('./src/loaders/model')(config);
+const withTransaction = require('./src/util/transactional')(models);
+const errors = require('./src/errors');
+const crudController = require('./src/crud/crud-controller')(withTransaction);
+const crudService = require('./src/crud/crud-service');
+const appLoader = require('./src/loaders/app');
 
 const start = () => {
-  // the controllers are loaded later so that mini-mvcs package is available in the
+  // the app is loaded later so that mini-mvcs package is available in the
   // controllers and services that inherit from crudController and crudService
-  const expressApp = controllerLoader(config, models);
+  // but making the services impossible to be imported in an additional custom
+  // layer of the app (this should be prompted later)
+  const app = appLoader(config, models);
 
   // starts the app after syncing the database
   models.sequelize.sync().then(() => {
@@ -22,10 +24,10 @@ const start = () => {
     } else {
       const configServer = config.server || {};
       const port = configServer.port || 4000;
-      expressApp.listen(port);
+      app.listen(port);
       // eslint-disable-next-line no-console
       console.log(`MiniMVCS app running on http://localhost:${port}
-Here is an ascii art beaver
+Here it is an ASCII Art Beaver
             ___
          .="   "=._.---.
        ."         c ' Y'\`p

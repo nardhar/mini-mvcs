@@ -1,10 +1,12 @@
 {
   "name": "mini-mvcs",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "MVCS mini framework for creating node rest apps, using express, sequelize",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_ENV=test mocha test/unit/**/**.spec.js test/integration/**/**.spec.js",
+    "test-unit": "NODE_ENV=test mocha test/unit/**/**.spec.js",
+    "test-int": "NODE_ENV=test mocha test/integration/**/**.spec.js"
   },
   "repository": {
     "type": "git",
@@ -15,22 +17,26 @@
     "rest",
     "express",
     "sequelize",
-    "ddd",
     "mvc"
   ],
   "author": "Felix Carreño <felix@felixcarreno.com>",
   "license": "MIT",
   "dependencies": {
-    "body-parser": "^1.18.2",
-    "cors": "^2.8.4",
-    "express": "^4.16.3",
-    "pg": "^7.4.1",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "pg": "^7.6.1",
     "pg-hstore": "^2.3.2",
-    "sequelize": "^4.37.6"
+    "sequelize": "^4.41.2"
   },
   "devDependencies": {
+    "chai": "^4.1.2",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.11.0"
+    "eslint-plugin-import": "^2.11.0",
+    "mocha": "^5.1.1",
+    "rewiremock": "^3.7.7",
+    "sequelize-mock": "^0.10.2",
+    "supertest": "^3.1.0"
   }
 }
