@@ -9,6 +9,12 @@ const path = require('path');
  * @return {Array<Object>} List of files with its name and path
  */
 const loaddirSync = (dir, suffix, ignore = []) => {
+  // checking if the folder exists and if it can be read
+  try {
+    fs.accessSync(dir, fs.constants.R_OK);
+  } catch (error) {
+    return [];
+  }
   return fs.readdirSync(dir).reduce((fileList, file) => {
     // it builds the file's full path
     const filePath = path.join(dir, file);
