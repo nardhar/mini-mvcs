@@ -1,7 +1,16 @@
 const { expect } = require('chai');
+const { constants } = require('fs');
 const rewiremock = require('rewiremock').default;
 
 rewiremock('fs').with({
+  constants,
+  accessSync(dir, mode = constants.F_OK) {
+    if (dir === 'notExistent') {
+      throw new Error('Folder not found');
+    } else if (dir === 'notReadable' && mode === constants.R_OK) {
+      throw new Error('Folder not readable');
+    }
+  },
   readdirSync(dir) {
     if (dir === 'dir1') {
       return ['dir11', 'file1.js', 'file2.js', 'ignore.js'];
@@ -89,6 +98,18 @@ describe('Unit Testing file Util module', () => {
       expect(filePathList).to.deep.include({ file: 'file2.js', path: 'dir1/file2.js' });
       expect(filePathList).to.deep.include({ file: 'file11.js', path: 'dir1/dir11/file11.js' });
       expect(filePathList).to.deep.include({ file: 'file12.js', path: 'dir1/dir11/file12.js' });
+      done();
+    });
+
+    it('should not load non existent folders', (done) => {
+      const filePathList = fileUtil.loaddirSync('notExistent', '.js', []);
+      expect(filePathList).to.have.length(0);
+      done();
+    });
+
+    it('should not load non readable folders', (done) => {
+      const filePathList = fileUtil.loaddirSync('notReadable', '.js', []);
+      expect(filePathList).to.have.length(0);
       done();
     });
   });
