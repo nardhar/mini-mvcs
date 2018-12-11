@@ -18,7 +18,7 @@ const start = () => {
   const app = appLoader(config, models);
 
   // starts the app after syncing the database
-  models.sequelize.sync().then(() => {
+  return models.sequelize.sync().then(() => {
     if (process.env.FORCE || false) {
       process.exit(0);
     } else {
@@ -36,6 +36,7 @@ Here it is an ASCII Art Beaver
 _,..._|      )_-\\ \\_=.\\
 \`-....-'\`------)))\`=-'"\`'"`);
     }
+    return app;
   });
 };
 
