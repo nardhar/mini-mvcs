@@ -67,6 +67,39 @@ describe('Unit Testing errors Api', () => {
       done();
     });
 
+    it('should create an instance with errors as objects', (done) => {
+      const err = new ValidationError('Object', [
+        { field: 'sampleField', code: 'sampleCode' },
+        { field: 'anotherField', code: 'anotherCode', args: [1, 2, 3] },
+      ]);
+
+      expect(err).to.be.an('error');
+      expect(err).to.have.property('objectName');
+      expect(err).to.have.property('data');
+      expect(err).to.have.property('message');
+      expect(err.hasErrors()).to.equal(true);
+      expect(err.objectName).to.equal('Object');
+      expect(err.message).to.equal('Validation error with "Object"');
+      expect(err.getErrors()).to.be.an.instanceof(Array);
+      expect(err.getErrors()).to.have.length(2);
+      expect(err.getErrors()[0]).to.have.property('field');
+      expect(err.getErrors()[0]).to.have.property('code');
+      expect(err.getErrors()[0]).to.have.property('args');
+      expect(err.getErrors()[0].field).to.equal('sampleField');
+      expect(err.getErrors()[0].code).to.equal('sampleCode');
+      expect(err.getErrors()[0].args).to.be.an.instanceof(Array);
+      expect(err.getErrors()[0].args).to.have.length(0);
+      expect(err.getErrors()[1]).to.have.property('field');
+      expect(err.getErrors()[1]).to.have.property('code');
+      expect(err.getErrors()[1]).to.have.property('args');
+      expect(err.getErrors()[1].field).to.equal('anotherField');
+      expect(err.getErrors()[1].code).to.equal('anotherCode');
+      expect(err.getErrors()[1].args).to.be.an.instanceof(Array);
+      expect(err.getErrors()[1].args).to.have.length(3);
+      expect(err.getErrors()[1].args).to.deep.equal([1, 2, 3]);
+      done();
+    });
+
     it('should create an instance and add errors later', (done) => {
       const err = new ValidationError('Object');
       expect(err).to.be.an('error');
