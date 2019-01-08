@@ -1,6 +1,6 @@
 {
   "name": "mini-mvcs",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "MVCS mini framework for creating node rest apps, using express, sequelize",
   "main": "index.js",
   "scripts": {
