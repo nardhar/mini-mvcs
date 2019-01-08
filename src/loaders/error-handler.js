@@ -40,7 +40,7 @@ module.exports = (config = {}) => {
         // if it is not a controlled error, then send a Server error
         // (some code has thrown an exception)
         res.status(errorCodes.internal).json(errorRenderer({
-          message: 'Internal Server Error',
+          message: err.message || 'Internal Server Error',
           getBody() { return []; },
         }));
       }
