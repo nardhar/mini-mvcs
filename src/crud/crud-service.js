@@ -50,7 +50,10 @@ module.exports = (model) => {
 
   service.validateWrapper = (instance) => {
     return instance.validate()
-    .then((sequelizeValidationError) => {
+    .then(() => {
+      return new ValidationError(model.name, []);
+    })
+    .catch((sequelizeValidationError) => {
       return new ValidationError(model.name, sequelizeValidationError);
     })
     .then((validationError) => {
