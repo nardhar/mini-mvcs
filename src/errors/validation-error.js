@@ -5,7 +5,8 @@ class ValidationError extends ApiError {
   constructor(objectName, errors = []) {
     super('ValidationError', `Validation error with "${objectName}"`);
     this.objectName = objectName;
-    this.data = errors.map((error) => {
+    // in case errors was null, then always use an array
+    this.data = (errors || []).map((error) => {
       return error instanceof FieldError
         ? error
         : new FieldError(error.field || null, error.code || '', error.args || []);
