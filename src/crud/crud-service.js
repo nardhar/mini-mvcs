@@ -39,6 +39,8 @@ const defaultFilter = (params, model) => {
   return {
     ...(Object.keys(where).length > 0 ? { where } : {}),
     ...(include.length > 0 ? { include } : {}),
+    // we manage the order globally
+    ...('order' in params ? { order: params.order } : {}),
   };
 };
 
