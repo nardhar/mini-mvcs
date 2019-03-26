@@ -2,7 +2,7 @@ const { ValidationError, NotFoundError } = require('../errors');
 
 const objectMinusProperty = (object, property) => {
   return Object.keys(object).reduce((acc, val) => {
-    return val === property ? acc : Object.assign({}, acc, { [val]: object[val] });
+    return val === property ? acc : { ...acc, [val]: object[val] };
   }, {});
 };
 
@@ -16,33 +16,30 @@ const defaultFilter = (params, model) => {
     if (['limit', 'offset', 'page'].indexOf(key) >= 0) return whereResult;
     // if it is an association
     if (key in model.associations) {
-      include.push(Object.assign(
-        {
-          model: model.associations[key].target,
-          as: model.associations[key].as,
-        },
+      include.push({
+        model: model.associations[key].target,
+        as: model.associations[key].as,
         // associations are "required" on demand
-        'required' in params[key] ? { required: params[key].required } : {},
+        ...('required' in params[key] ? { required: params[key].required } : {}),
         // using the default filter again over the associated model
-        defaultFilter(
+        ...defaultFilter(
           // whether it is required or not then it should remove the "required" property
           objectMinusProperty(params[key], 'required'),
           // sends the associated model for base of the new filter
           model.associations[key].target,
         ),
-      ));
+      });
       return whereResult;
     }
     // TODO: maybe it should add only if it is either a Sequelize.Op or a model property
-    return Object.assign({}, whereResult, { [key]: params[key] });
+    return { ...whereResult, [key]: params[key] };
   }, {});
 
   // builds the final object
-  return Object.assign(
-    {},
-    Object.keys(where).length > 0 ? { where } : {},
-    include.length > 0 ? { include } : {},
-  );
+  return {
+    ...(Object.keys(where).length > 0 ? { where } : {}),
+    ...(include.length > 0 ? { include } : {}),
+  };
 };
 
 module.exports = (model) => {
@@ -93,11 +90,10 @@ module.exports = (model) => {
    */
   service.filter = (params) => {
     // builds the final object (it adds pagination here)
-    return Object.assign(
-      {},
-      service.offsetLimit(params),
-      defaultFilter(params, model),
-    );
+    return {
+      ...service.offsetLimit(params),
+      ...defaultFilter(params, model),
+    };
   };
 
   service.offsetLimit = (params) => {
