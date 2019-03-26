@@ -7,10 +7,46 @@ const crudService = require('../../../src/crud/crud-service');
 const dbMock = new SequelizeMock();
 
 const BookMock = dbMock.define('book', {
+  id: 1,
   title: 'Birds and Planes',
 });
 
 BookMock.associations = {};
+
+const AuthorFilterMock = {
+  name: 'Author',
+  associations: {},
+};
+const CategoryFilterMock = {
+  name: 'Category',
+  associations: {},
+};
+const BookFilterMock = {
+  name: 'Book',
+  associations: {
+    author: {
+      target: AuthorFilterMock,
+      as: 'author',
+    },
+    category: {
+      target: CategoryFilterMock,
+      as: 'category',
+    },
+  },
+};
+
+AuthorFilterMock.associations = {
+  books: {
+    target: BookFilterMock,
+    as: 'books',
+  },
+};
+CategoryFilterMock.associations = {
+  books: {
+    target: BookFilterMock,
+    as: 'books',
+  },
+};
 
 describe('Unit Testing CRUD Service', () => {
   describe('Creating a CRUD service', () => {
@@ -30,6 +66,97 @@ describe('Unit Testing CRUD Service', () => {
       expect(bookCrudService).to.have.property('update');
       expect(bookCrudService).to.have.property('validate');
       expect(bookCrudService).to.have.property('delete');
+      done();
+    });
+  });
+
+  describe('Filter method', () => {
+    it('should return a simple object with conditions', (done) => {
+      const bookCrudService = crudService(BookFilterMock);
+
+      expect(bookCrudService).to.be.an('object');
+      expect(bookCrudService).to.have.property('filter');
+      expect(bookCrudService.filter({ title: 'Reading Better' })).to.deep.equal({
+        where: {
+          title: 'Reading Better',
+        },
+      });
+      done();
+    });
+
+    it('should return a complex object with conditions', (done) => {
+      const bookCrudService = crudService(BookFilterMock);
+
+      expect(bookCrudService).to.be.an('object');
+      expect(bookCrudService).to.have.property('filter');
+      expect(bookCrudService.filter({
+        title: 'Reading Better',
+        author: {
+          name: 'John',
+        },
+        limit: 10,
+        offset: 5,
+        order: [['name']],
+      })).to.deep.equal({
+        where: {
+          title: 'Reading Better',
+        },
+        include: [
+          {
+            model: AuthorFilterMock,
+            as: 'author',
+            where: {
+              name: 'John',
+            },
+          },
+        ],
+        limit: 10,
+        offset: 5,
+        order: [['name']],
+      });
+      done();
+    });
+
+    it('should return a multiple associated object with conditions', (done) => {
+      const authorCrudService = crudService(AuthorFilterMock);
+
+      expect(authorCrudService).to.be.an('object');
+      expect(authorCrudService).to.have.property('filter');
+      expect(authorCrudService.filter({
+        name: 'John Smith',
+        books: {
+          title: 'Programming with NodeJS',
+          category: {
+            name: 'software development',
+          },
+        },
+        limit: 10,
+        offset: 5,
+      })).to.deep.equal({
+        where: {
+          name: 'John Smith',
+        },
+        include: [
+          {
+            model: BookFilterMock,
+            as: 'books',
+            where: {
+              title: 'Programming with NodeJS',
+            },
+            include: [
+              {
+                model: CategoryFilterMock,
+                as: 'category',
+                where: {
+                  name: 'software development',
+                },
+              },
+            ],
+          },
+        ],
+        limit: 10,
+        offset: 5,
+      });
       done();
     });
   });

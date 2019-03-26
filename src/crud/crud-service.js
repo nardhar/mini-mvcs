@@ -13,7 +13,7 @@ const defaultFilter = (params, model) => {
   const include = [];
   const where = Object.keys(params).reduce((whereResult, key) => {
     // it doesn't add pagination properties
-    if (['limit', 'offset', 'page'].indexOf(key) >= 0) return whereResult;
+    if (['limit', 'offset', 'page', 'order'].indexOf(key) >= 0) return whereResult;
     // if it is an association
     if (key in model.associations) {
       include.push({
