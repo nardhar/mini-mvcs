@@ -101,7 +101,7 @@ describe('Unit Testing error handler', () => {
       expect(result).to.have.property('code');
       expect(result).to.have.property('data');
       expect(result.code).to.equal(500);
-      expect(result.data).to.deep.equal({ message: 'Internal Server Error', errors: [] });
+      expect(result.data).to.deep.equal({ message: err.message, errors: [] });
       done();
     });
 
@@ -244,7 +244,7 @@ describe('Unit Testing error handler', () => {
         },
       })(err, {}, resMock, {});
 
-      expect(result.data).to.deep.equal({ errorMessage: 'Internal Server Error', errorList: [] });
+      expect(result.data).to.deep.equal({ errorMessage: err.message, errorList: [] });
       done();
     });
   });
