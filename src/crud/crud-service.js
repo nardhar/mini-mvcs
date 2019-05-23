@@ -72,9 +72,24 @@ module.exports = (model) => {
     return model.findAndCountAll(service.filter(params));
   };
 
+  /**
+   * Reads a record by its primaryKey value
+   * If the model's primary key is composite, then *id* should be an object with the
+   * fields and values of the composite primaryKey
+   * @param {String|Integer|Object} id The value for the primaryKey
+   * @return {Object} instance found
+   * @throw {NotFoundError} if the instance is not found
+   */
   service.read = (id) => {
     return model.findOne({
-      where: { id },
+      // finding out the primaryKey(s) of the table
+      where: Object.keys(model.primaryKeys).reduce((condition, field) => {
+        return {
+          ...condition,
+          // if id is an object then it returns its field property vale
+          [field]: typeof id === 'object' ? id[field] : id,
+        };
+      }, {}),
     })
     .then((instance) => {
       if (!instance) throw new NotFoundError(model.name, id);
