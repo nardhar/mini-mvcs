@@ -15,7 +15,9 @@ const loaddirSync = (dir, suffix, ignore = []) => {
   } catch (error) {
     return [];
   }
-  return fs.readdirSync(dir).reduce((fileList, file) => {
+
+  const fileList = [];
+  fs.readdirSync(dir).forEach((file) => {
     // it builds the file's full path
     const filePath = path.join(dir, file);
     // asking if it is not a directory to try to import it
@@ -30,14 +32,18 @@ const loaddirSync = (dir, suffix, ignore = []) => {
         && (file.slice(-suffix.length) === suffix)
       ) {
         // adds the file info to the current fileList array
-        return fileList.concat({ file, path: filePath });
+        fileList.push({ file, path: filePath });
       }
-      // if it is not a loadable file, then returns the same fileList without adding anything
-      return fileList;
+      // if it is not a loadable file, then it doesn't add anything
+    } else {
+      // if it is a directory then it runs the same function over this directory
+      loaddirSync(filePath, suffix, ignore).forEach((fileInDir) => {
+        fileList.push(fileInDir);
+      });
     }
-    // if it is a directory then it runs the same function over this directory
-    return fileList.concat(loaddirSync(filePath, suffix, ignore));
   }, []);
+
+  return fileList;
 };
 
 const normalizeName = (name) => {
