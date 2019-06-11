@@ -1,5 +1,4 @@
 const path = require('path');
-const { Op } = require('sequelize');
 
 const env = process.env.NODE_ENV || 'development';
 
@@ -14,7 +13,6 @@ module.exports = (appPath) => {
     database: {
       ...configDatabase,
       sync: { force: process.env.FORCE || configDatabaseSync.force },
-      operatorsAliases: Op,
     },
   };
 };
