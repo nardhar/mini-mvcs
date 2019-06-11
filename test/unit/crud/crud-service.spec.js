@@ -12,6 +12,9 @@ const BookMock = dbMock.define('book', {
 });
 
 BookMock.associations = {};
+BookMock.primaryKeys = {
+  id: {},
+};
 
 const AuthorFilterMock = {
   name: 'Author',
