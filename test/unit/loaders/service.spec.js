@@ -10,14 +10,38 @@ rewiremock('path').with({
 });
 rewiremock('../util/file').with({
   loaddirSync(folder, suffix, ignore) {
-    return [
-      'book.service.js',
-      'author.service.js',
-      'ignore.service.js',
-      'notaservice.js',
-    ]
+    const fileList = (f) => {
+      if (f === '../../test/resource/srcSample/servicesIgnore') {
+        return [
+          'author.service.js',
+          'author2.service.js',
+          'book.service.js',
+        ];
+      }
+      if (f === '../../test/resource/srcSample/servicesNamespace') {
+        return [
+          'library/library.service.js',
+          'library/publisher.service.js',
+          'person/writer/author.service.js',
+          'person/writer/publisher.service.js',
+          'person/fan.service.js',
+          'person/reader.service.js',
+          'book.service.js',
+        ];
+      }
+      return [
+        'book.service.js',
+        'author.service.js',
+        'ignore.service.js',
+        'notaservice.js',
+      ];
+    };
+    return fileList(folder)
     .map((file) => {
-      return { file, path: `${folder}/${file}` };
+      return {
+        file: file.includes(path.sep) ? file.substring(file.lastIndexOf(path.sep) + 1) : file,
+        path: `${folder}${path.sep}${file}`,
+      };
     })
     .filter((file) => {
       return file.file.slice(-suffix.length) === suffix && ignore.indexOf(file.file) < 0;
@@ -130,7 +154,7 @@ describe('Unit Testing service Loader', () => {
           appPath: '../../test/resource/srcSample',
           service: {
             dir: 'servicesIgnore',
-            ignore: ['ignore.service.js'],
+            ignore: ['author2.service.js'],
           },
         },
         modelsMock,
@@ -138,8 +162,39 @@ describe('Unit Testing service Loader', () => {
       expect(services).to.be.an('object');
       expect(services).to.have.property('book');
       expect(services).to.have.property('author');
-      expect(services).to.not.have.property('ignore');
       expect(services).to.not.have.property('author2');
+      done();
+    });
+  });
+
+  describe('Loading of namespaced services', () => {
+    it('should load a default service folder with and without namespaces', (done) => {
+      const services = serviceLoader(
+        {
+          // since rewiremock only mocks existing modules we need to create the same file structure
+          // for importing the dynamically called services with require, even though they will be
+          // mocked here. Note: appPath must be relative to src/loaders/service
+          appPath: '../../test/resource/srcSample',
+          service: {
+            useNamespaces: true,
+            dir: 'servicesNamespace',
+          },
+        },
+        modelsMock,
+      );
+      expect(services).to.be.an('object');
+      expect(services).to.have.property('places');
+      expect(services.places).to.have.property('library');
+      expect(services).to.have.property('library');
+      expect(services.library).to.have.property('publisher');
+      expect(services).to.have.property('person');
+      expect(services.person).to.have.property('writer');
+      expect(services.person.writer).to.have.property('author');
+      expect(services.person.writer).to.have.property('publisher');
+      expect(services.person).to.have.property('fan');
+      expect(services.library).to.have.property('geek');
+      expect(services.library.geek).to.have.property('reader');
+      expect(services).to.have.property('book');
       done();
     });
   });
