@@ -10,14 +10,38 @@ rewiremock('path').with({
 });
 rewiremock('../util/file').with({
   loaddirSync(folder, suffix, ignore) {
-    return [
-      'book.service.js',
-      'author.service.js',
-      'ignore.service.js',
-      'notaservice.js',
-    ]
+    const fileList = (f) => {
+      if (f === '../../test/resource/srcSample/servicesIgnore') {
+        return [
+          'author.service.js',
+          'author2.service.js',
+          'book.service.js',
+        ];
+      }
+      if (f === '../../test/resource/srcSample/servicesNamespace') {
+        return [
+          'library/library.service.js',
+          'library/publisher.service.js',
+          'person/writer/author.service.js',
+          'person/writer/publisher.service.js',
+          'person/fan.service.js',
+          'person/reader.service.js',
+          'book.service.js',
+        ];
+      }
+      return [
+        'book.service.js',
+        'author.service.js',
+        'ignore.service.js',
+        'notaservice.js',
+      ];
+    };
+    return fileList(folder)
     .map((file) => {
-      return { file, path: `${folder}/${file}` };
+      return {
+        file: file.includes(path.sep) ? file.substring(file.lastIndexOf(path.sep) + 1) : file,
+        path: `${folder}${path.sep}${file}`,
+      };
     })
     .filter((file) => {
       return file.file.slice(-suffix.length) === suffix && ignore.indexOf(file.file) < 0;
@@ -130,7 +154,7 @@ describe('Unit Testing service Loader', () => {
           appPath: '../../test/resource/srcSample',
           service: {
             dir: 'servicesIgnore',
-            ignore: ['ignore.service.js'],
+            ignore: ['author2.service.js'],
           },
         },
         modelsMock,
@@ -138,7 +162,6 @@ describe('Unit Testing service Loader', () => {
       expect(services).to.be.an('object');
       expect(services).to.have.property('book');
       expect(services).to.have.property('author');
-      expect(services).to.not.have.property('ignore');
       expect(services).to.not.have.property('author2');
       done();
     });
@@ -179,6 +202,76 @@ describe('Unit Testing service Loader', () => {
       expect(bookServiceSaveAuthorResult).to.have.property('action', 'save');
       expect(bookServiceSaveAuthorResult).to.have.property('model', 'Author');
       expect(bookServiceSaveAuthorResult).to.have.property('params', authorSaveParams);
+
+      done();
+    });
+  });
+
+  describe('Loading of namespaced services', () => {
+    it('should load a default service folder with and without namespaces', (done) => {
+      const services = serviceLoader(
+        {
+          // since rewiremock only mocks existing modules we need to create the same file structure
+          // for importing the dynamically called services with require, even though they will be
+          // mocked here. Note: appPath must be relative to src/loaders/service
+          appPath: '../../test/resource/srcSample',
+          service: {
+            useNamespaces: true,
+            dir: 'servicesNamespace',
+          },
+        },
+        modelsMock,
+      );
+      expect(services).to.be.an('object');
+      expect(services).to.have.property('places');
+      expect(services.places).to.have.property('library');
+      expect(services).to.have.property('library');
+      expect(services.library).to.have.property('publisher');
+      expect(services).to.have.property('person');
+      expect(services.person).to.have.property('writer');
+      expect(services.person.writer).to.have.property('author');
+      expect(services.person.writer).to.have.property('publisher');
+      expect(services.person).to.have.property('fan');
+      expect(services.library).to.have.property('geek');
+      expect(services.library.geek).to.have.property('reader');
+      expect(services).to.have.property('book');
+
+      // testing execution of services
+
+      // library/library
+      expect(services.places.library).to.have.property('list');
+      expect(services.places.library.list).to.be.a('function');
+      expect(services.places.library.list()).to.equal('places.library.list()');
+
+      // library/publisher
+      expect(services.library.publisher).to.have.property('list');
+      expect(services.library.publisher.list).to.be.a('function');
+      expect(services.library.publisher.list()).to.equal('library.publisher.list()');
+
+      // person/writer/author
+      expect(services.person.writer.author).to.have.property('list');
+      expect(services.person.writer.author.list).to.be.a('function');
+      expect(services.person.writer.author.list()).to.equal('person.writer.author.list()');
+
+      // person/writer/publisher
+      expect(services.person.writer.publisher).to.have.property('list');
+      expect(services.person.writer.publisher.list).to.be.a('function');
+      expect(services.person.writer.publisher.list()).to.equal('person.writer.publisher.list()');
+
+      // person/fan
+      expect(services.person.fan).to.have.property('list');
+      expect(services.person.fan.list).to.be.a('function');
+      expect(services.person.fan.list()).to.equal('person.fan.list()');
+
+      // person/reader
+      expect(services.library.geek.reader).to.have.property('list');
+      expect(services.library.geek.reader.list).to.be.a('function');
+      expect(services.library.geek.reader.list()).to.equal('library.geek.reader.list()');
+
+      // book
+      expect(services.book).to.have.property('list');
+      expect(services.book.list).to.be.a('function');
+      expect(services.book.list()).to.equal('book.list()');
 
       done();
     });
