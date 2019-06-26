@@ -21,21 +21,24 @@ const start = () => {
   return models.sequelize.sync().then(() => {
     if (process.env.FORCE || false) {
       process.exit(0);
-    } else {
-      const configServer = config.server || {};
-      const port = configServer.port || 4000;
-      app.listen(port);
-      // eslint-disable-next-line no-console
-      console.log(`MiniMVCS app running on http://localhost:${port}
+      return app;
+    }
+    if (process.env.NODE_ENV === 'test') {
+      return app;
+    }
+    const configServer = config.server || {};
+    const port = configServer.port || 4000;
+    app.listen(port);
+    // eslint-disable-next-line no-console
+    console.log(`MiniMVCS app running on http://localhost:${port}
 Here it is an ASCII Art Beaver
-            ___
-         .="   "=._.---.
-       ."         c ' Y'\`p
-      /   ,       \`.  w_/
-  jgs |   '-.   /     /
+          ___
+       .="   "=._.---.
+     ."         c ' Y'\`p
+    /   ,       \`.  w_/
+jgs |   '-.   /     /
 _,..._|      )_-\\ \\_=.\\
 \`-....-'\`------)))\`=-'"\`'"`);
-    }
     return app;
   });
 };
