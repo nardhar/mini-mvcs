@@ -27,7 +27,7 @@
     "express": "^4.16.4",
     "pg": "^7.9.0",
     "pg-hstore": "^2.3.2",
-    "sequelize": "^5.3.3"
+    "sequelize": "^5.8.12"
   },
   "devDependencies": {
     "chai": "^4.2.0",
