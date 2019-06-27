@@ -21,9 +21,7 @@ rewiremock('./config').with({
     },
   },
 });
-rewiremock('sequelize').with({
-  Op: 'sequelize.Op',
-});
+rewiremock('sequelize').with({});
 
 let config;
 
@@ -45,7 +43,6 @@ describe('Unit Testing config Loader', () => {
       expect(configFile.database).to.have.property('sync');
       expect(configFile.database.sync).to.have.property('force');
       expect(Boolean(configFile.database.sync.force)).to.be.a('Boolean');
-      expect(configFile.database).to.have.property('operatorsAliases', 'sequelize.Op');
       // check for loading of config file
       expect(configFile).to.have.property('api', 'path');
       expect(configFile).to.have.property('port', 8080);

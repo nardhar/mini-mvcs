@@ -49,7 +49,7 @@ module.exports = (config, router) => {
               // will send data if no response was already sent
               if (!res.headersSent) {
                 // we use the configured status code by the request method
-                res.status(statusCode[req.method] || statusCode.default)
+                res.status(statusCode[req.method.toLowerCase()] || statusCode.default)
                 .json(templater(req, res, body));
               }
             })
