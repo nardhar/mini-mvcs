@@ -35,7 +35,7 @@
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.16.0",
     "mocha": "^6.1.4",
-    "rewiremock": "^3.13.4",
+    "rewiremock": "^3.13.7",
     "sequelize-mock": "^0.10.2",
     "supertest": "^4.0.2"
   }
