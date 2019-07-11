@@ -1,6 +1,6 @@
 {
   "name": "mini-mvcs",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "MVCS mini framework for creating node rest apps, using express, sequelize",
   "main": "index.js",
   "scripts": {
@@ -35,7 +35,7 @@
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.16.0",
     "mocha": "^6.1.4",
-    "rewiremock": "^3.13.4",
+    "rewiremock": "^3.13.7",
     "sequelize-mock": "^0.10.2",
     "supertest": "^4.0.2"
   }
