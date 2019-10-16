@@ -162,6 +162,72 @@ describe('Unit Testing CRUD Service', () => {
       });
       done();
     });
+
+    it('should return a simple object with conditions and attributes', (done) => {
+      const bookCrudService = crudService(BookFilterMock);
+
+      expect(bookCrudService).to.be.an('object');
+      expect(bookCrudService).to.have.property('filter');
+      expect(bookCrudService.filter({
+        attributes: ['title'],
+        title: 'Reading Better',
+      })).to.deep.equal({
+        attributes: ['title'],
+        where: {
+          title: 'Reading Better',
+        },
+      });
+      done();
+    });
+
+    it('should return a multiple associated object with conditions and attributes', (done) => {
+      const authorCrudService = crudService(AuthorFilterMock);
+
+      expect(authorCrudService).to.be.an('object');
+      expect(authorCrudService).to.have.property('filter');
+      expect(authorCrudService.filter({
+        attributes: ['name'],
+        name: 'John Smith',
+        books: {
+          title: 'Programming with NodeJS',
+          attributes: ['title'],
+          category: {
+            name: 'software development',
+            attributes: ['name'],
+          },
+        },
+        limit: 10,
+        offset: 5,
+      })).to.deep.equal({
+        attributes: ['name'],
+        where: {
+          name: 'John Smith',
+        },
+        include: [
+          {
+            model: BookFilterMock,
+            as: 'books',
+            attributes: ['title'],
+            where: {
+              title: 'Programming with NodeJS',
+            },
+            include: [
+              {
+                model: CategoryFilterMock,
+                as: 'category',
+                attributes: ['name'],
+                where: {
+                  name: 'software development',
+                },
+              },
+            ],
+          },
+        ],
+        limit: 10,
+        offset: 5,
+      });
+      done();
+    });
   });
 
   describe('Listing models', () => {

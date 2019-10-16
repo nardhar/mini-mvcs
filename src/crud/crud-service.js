@@ -14,7 +14,7 @@ const defaultFilter = (params, model) => {
   const where = Object.keys(params).concat(Object.getOwnPropertySymbols(params))
   .reduce((whereResult, key) => {
     // it doesn't add pagination properties
-    if (['limit', 'offset', 'page', 'order'].indexOf(key) >= 0) return whereResult;
+    if (['limit', 'offset', 'page', 'order', 'attributes'].indexOf(key) >= 0) return whereResult;
     // if it is an association
     if (key in model.associations) {
       include.push({
@@ -46,6 +46,8 @@ const defaultFilter = (params, model) => {
     ...(include.length > 0 ? { include } : {}),
     // we manage the order globally
     ...('order' in params ? { order: params.order } : {}),
+    // adding the attributes
+    ...('attributes' in params ? { attributes: params.attributes } : {}),
   };
 };
 
