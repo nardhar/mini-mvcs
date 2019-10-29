@@ -1,17 +1,48 @@
 const { expect } = require('chai');
 // NOTE: sequelize-mock is not working right, or at least it does not emulates a database state
 // maybe a custom sequelize mock should be created or convert all these tests into integration ones
-const SequelizeMock = require('sequelize-mock');
 const crudService = require('../../../src/crud/crud-service');
 
-const dbMock = new SequelizeMock();
+class BookModelMock {
+  set(params) {
+    this.title = params.title;
+  }
 
-const BookMock = dbMock.define('book', {
-  id: 1,
-  title: 'Birds and Planes',
-});
+  validate() {
+    return Promise.resolve(this);
+  }
 
-BookMock.associations = {};
+  save() {
+    this.id = 1;
+    return Promise.resolve(this);
+  }
+
+  destroy() {
+    this.id = null;
+    return Promise.resolve();
+  }
+}
+
+BookModelMock.build = (params) => {
+  const instance = new BookModelMock();
+  instance.set(params);
+  return instance;
+};
+BookModelMock.associations = {};
+BookModelMock.primaryKeys = { id: 'id' };
+BookModelMock.name = 'Book';
+
+const bookMockRecord = BookModelMock.build({ title: 'Birds and Planes' });
+
+BookModelMock.findOne = () => {
+  return Promise.resolve(bookMockRecord);
+};
+BookModelMock.findAll = () => {
+  return Promise.resolve([bookMockRecord]);
+};
+BookModelMock.findAndCountAll = () => {
+  return Promise.resolve({ rows: [bookMockRecord], count: 1 });
+};
 
 const AuthorFilterMock = {
   name: 'Author',
@@ -51,7 +82,7 @@ CategoryFilterMock.associations = {
 describe('Unit Testing CRUD Service', () => {
   describe('Creating a CRUD service', () => {
     it('should have default methods', (done) => {
-      const bookCrudService = crudService(BookMock);
+      const bookCrudService = crudService(BookModelMock);
 
       expect(bookCrudService).to.be.an('object');
       expect(bookCrudService).to.have.property('list');
@@ -163,7 +194,7 @@ describe('Unit Testing CRUD Service', () => {
 
   describe('Listing models', () => {
     it('should list models', (done) => {
-      const bookCrudService = crudService(BookMock);
+      const bookCrudService = crudService(BookModelMock);
 
       expect(bookCrudService).to.be.an('object');
       expect(bookCrudService).to.have.property('list');
@@ -175,7 +206,7 @@ describe('Unit Testing CRUD Service', () => {
     });
 
     it('should list models with a query', (done) => {
-      const bookCrudService = crudService(BookMock);
+      const bookCrudService = crudService(BookModelMock);
 
       expect(bookCrudService).to.be.an('object');
       expect(bookCrudService).to.have.property('list');
@@ -187,7 +218,7 @@ describe('Unit Testing CRUD Service', () => {
     });
 
     it('should list and count all models', (done) => {
-      const bookCrudService = crudService(BookMock);
+      const bookCrudService = crudService(BookModelMock);
 
       expect(bookCrudService).to.be.an('object');
       expect(bookCrudService).to.have.property('listAndCount');
@@ -203,7 +234,7 @@ describe('Unit Testing CRUD Service', () => {
 
   describe('Reading models', () => {
     it('should read a model through an id', (done) => {
-      const bookCrudService = crudService(BookMock);
+      const bookCrudService = crudService(BookModelMock);
 
       expect(bookCrudService).to.be.an('object');
       expect(bookCrudService).to.have.property('read');
@@ -215,7 +246,7 @@ describe('Unit Testing CRUD Service', () => {
     });
 
     it('should find a model through a query', (done) => {
-      const bookCrudService = crudService(BookMock);
+      const bookCrudService = crudService(BookModelMock);
 
       expect(bookCrudService).to.be.an('object');
       expect(bookCrudService).to.have.property('read');
@@ -229,7 +260,7 @@ describe('Unit Testing CRUD Service', () => {
 
   describe('Creating models', () => {
     it('should create a model', (done) => {
-      const bookCrudService = crudService(BookMock);
+      const bookCrudService = crudService(BookModelMock);
 
       expect(bookCrudService).to.be.an('object');
       expect(bookCrudService).to.have.property('create');
@@ -242,7 +273,7 @@ describe('Unit Testing CRUD Service', () => {
 
   describe('saving models', () => {
     it('should save a model', (done) => {
-      const bookCrudService = crudService(BookMock);
+      const bookCrudService = crudService(BookModelMock);
 
       expect(bookCrudService).to.be.an('object');
       expect(bookCrudService).to.have.property('save');
@@ -256,7 +287,7 @@ describe('Unit Testing CRUD Service', () => {
 
   describe('editing models', () => {
     it('should edit a model', (done) => {
-      const bookCrudService = crudService(BookMock);
+      const bookCrudService = crudService(BookModelMock);
 
       expect(bookCrudService).to.be.an('object');
       expect(bookCrudService).to.have.property('edit');
@@ -270,7 +301,7 @@ describe('Unit Testing CRUD Service', () => {
 
   describe('updating models', () => {
     it('should update a model', (done) => {
-      const bookCrudService = crudService(BookMock);
+      const bookCrudService = crudService(BookModelMock);
 
       expect(bookCrudService).to.be.an('object');
       expect(bookCrudService).to.have.property('update');
@@ -289,11 +320,11 @@ describe('Unit Testing CRUD Service', () => {
 
   describe('deleting models', () => {
     it('should update a model', (done) => {
-      const bookCrudService = crudService(BookMock);
+      const bookCrudService = crudService(BookModelMock);
 
       expect(bookCrudService).to.be.an('object');
       expect(bookCrudService).to.have.property('delete');
-      bookCrudService.delete(1, { title: 'the crow' }).then(done);
+      bookCrudService.delete(1).then(done);
     });
   });
 });
