@@ -34,11 +34,6 @@ BookModelMock.name = 'Book';
 
 const bookMockRecord = BookModelMock.build({ title: 'Birds and Planes' });
 
-<<<<<<< HEAD
-BookMock.associations = {};
-BookMock.primaryKeys = {
-  id: {},
-=======
 BookModelMock.findOne = () => {
   return Promise.resolve(bookMockRecord);
 };
@@ -47,7 +42,6 @@ BookModelMock.findAll = () => {
 };
 BookModelMock.findAndCountAll = () => {
   return Promise.resolve({ rows: [bookMockRecord], count: 1 });
->>>>>>> v0.5.7
 };
 
 const AuthorFilterMock = {
